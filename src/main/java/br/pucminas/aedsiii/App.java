@@ -1,6 +1,6 @@
 package main.java.br.pucminas.aedsiii;
 
-public class BinaryFile {
+public class App {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
