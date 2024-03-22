@@ -10,8 +10,12 @@ public class DataBaseAccess {
 	private static char GRAVESTONE_SIGNAL = '*';
 	private RandomAccessFile db;
 	
-	public DataBaseAccess() throws Exception {
-		db = new RandomAccessFile("data.db", "rw");
+	public DataBaseAccess() {
+		try {
+			db = new RandomAccessFile("data.db", "rw");
+		} catch(Exception e) {
+			System.out.println("Error on open database.");
+		}
 	}
 	
 	public boolean createRecord(Music music) {
@@ -31,15 +35,14 @@ public class DataBaseAccess {
 	}
 	
 	public Music readRecord(int id) {
-		if(recordCanExists(id)) { return null; }
+		if(!recordCanExists(id)) { return null; }
 
 		MusicDTO dto = search(id);
-		
 		return dto != null ? dto.getMusic() : null;
 	}
 	
 	public boolean deleteRecord(int id) {
-		if(recordCanExists(id)) { return false; }
+		if(!recordCanExists(id)) { return false; }
 		
 		MusicDTO dto = search(id);
 		if(dto == null) { return false; }
@@ -56,6 +59,8 @@ public class DataBaseAccess {
 	}
 	
 	public boolean updateRecord(Music music) {
+		if(!recordCanExists(music.getID())) { return false; }
+		
 		MusicDTO dto = search(music.getID());
 		if(dto == null) { return false; }
 		
@@ -80,8 +85,13 @@ public class DataBaseAccess {
 		return true;
 	}
 	
-	public void close() throws IOException {
-		db.close();
+	public void close() {
+		try {
+			db.close();
+		} catch(Exception e) {
+			System.out.println("Error on closing database.");
+		}
+		
 	}
 	
 	

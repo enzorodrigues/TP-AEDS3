@@ -4,22 +4,23 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class Music {
-	private int id;
+	private int id = -1;
 	private String name;
-	private ArrayList<String> artists = new ArrayList<String>();
+	private String[] artists;
 	private byte artistsCount;
 	private Date releaseDate;
 	private int inSpotifyPlaylists;
 	private short rankSpotifyCharts;
-	private int spotifyStreams;
+	private long spotifyStreams;
 	
-	public Music() {}
+	public Music() {
+	}
 	
-	public Music(String name,  ArrayList<String> artists, byte artistsCount, Date releaseDate, 
-				int inSpotifyPlaylists, short rankSpotifyCharts, int spotifyStreams) {
-		this.id = -1;
+	public Music(String name,  String[] artists, byte artistsCount, Date releaseDate, 
+				int inSpotifyPlaylists, short rankSpotifyCharts, long spotifyStreams) {
 		this.name = name;
 		this.artists = artists;
 		this.artistsCount = artistsCount;
@@ -37,13 +38,34 @@ public class Music {
 		return id;
 	}
 
+	public void setInSpotifyPlaylists(int inSpotifyPlaylists) {
+		this.inSpotifyPlaylists = inSpotifyPlaylists;
+	}
+
+	public void setRankSpotifyCharts(short rankSpotifyCharts) {
+		this.rankSpotifyCharts = rankSpotifyCharts;
+	}
+
+	public void setSpotifyStreams(long spotifyStreams) {
+		this.spotifyStreams = spotifyStreams;
+	}
+
 	@Override
 	public String toString() {
-		return "[ID: " + id + "| Nome: " + name + "| Artistas: " + artists.toString() + ", Quantidade: "
-				+ artistsCount + "| Data de Lancamento: " + dateToString() + "| Spotify Playlists: " + inSpotifyPlaylists
-				+ "| Spotify Ranking: " + rankSpotifyCharts + "| Spotify Streams: " + spotifyStreams + "]";
+		return "[ID: " + id + " | Nome: " + name + " | Artistas: " + artistsToString() + ", Quantidade: "
+				+ artistsCount + " | Data de Lancamento: " + dateToString() + " | Spotify Playlists: " + inSpotifyPlaylists
+				+ " | Spotify Ranking: " + rankSpotifyCharts + " | Spotify Streams: " + spotifyStreams + " ]";
 	}
 	
+	private String artistsToString() {
+		String artists = "[";
+		for(String artist : this.artists) {
+			artists+= ", "+artist;
+		}
+		artists+= "]";
+		return artists.replaceFirst(", ", "");
+	}
+
 	private String dateToString() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 		String date = simpleDateFormat.format(releaseDate);
@@ -65,7 +87,7 @@ public class Music {
         dos.writeLong(this.releaseDate.getTime());
         dos.writeInt(this.inSpotifyPlaylists);
         dos.writeShort(this.rankSpotifyCharts);
-        dos.writeInt(this.spotifyStreams);
+        dos.writeLong(this.spotifyStreams);
         return baos.toByteArray();
     }
 	
@@ -77,14 +99,15 @@ public class Music {
         dis.readShort();
         this.name = dis.readUTF();
         this.artistsCount = dis.readByte();
+        this.artists = new String[artistsCount];
         for(int i=0; i < artistsCount; i++) {
         	dis.readShort();
-        	artists.add(dis.readUTF());
+        	artists[i] = (dis.readUTF());
         }
         this.releaseDate = new Date(dis.readLong());
         this.inSpotifyPlaylists = dis.readInt();
         this.rankSpotifyCharts = dis.readShort();
-        this.spotifyStreams = dis.readInt();
+        this.spotifyStreams = dis.readLong();
 	}
     
 	

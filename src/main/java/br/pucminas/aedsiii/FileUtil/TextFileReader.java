@@ -30,11 +30,8 @@ public class TextFileReader {
 		
 		try {
 			text = file.readLine();
-		} catch (EOFException e) {
-			text = "EOF";
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.out.println("Error on read line: " + e);
-			text = null;
 		}
 		finally {
 			return text;
