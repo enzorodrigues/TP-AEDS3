@@ -74,6 +74,8 @@ public class DataBaseAccess {
 				db.seek(dto.getGravestonePointer());
 				db.writeChar(GRAVESTONE_SIGNAL);
 				db.seek(db.length());
+				db.writeChar(' ');
+				db.writeInt(newMusic.length);
 			}
 			
 			db.write(newMusic);
@@ -93,7 +95,6 @@ public class DataBaseAccess {
 		}
 		
 	}
-	
 	
 	// MARK: - Private Functions
 

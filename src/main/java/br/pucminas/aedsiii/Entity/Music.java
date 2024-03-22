@@ -30,6 +30,19 @@ public class Music {
 		this.spotifyStreams = spotifyStreams;
 	}
 	
+	public Music(String name,  String artists, String releaseDate, int inSpotifyPlaylists, 
+				short rankSpotifyCharts, long spotifyStreams) {
+		
+		this(name, null, (byte)0, null, inSpotifyPlaylists, rankSpotifyCharts, spotifyStreams);
+		String[] arts = artists.split(",");
+		Date date = new Date(releaseDate);
+		
+		this.artists = arts;
+		this.artistsCount = (byte) arts.length;
+		this.releaseDate = date;
+	}
+	
+
 	public void setID(int id) {
 		this.id = id;
 	}
@@ -48,6 +61,19 @@ public class Music {
 
 	public void setSpotifyStreams(long spotifyStreams) {
 		this.spotifyStreams = spotifyStreams;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setArtists(String[] artists) {
+		this.artists = artists;
+		this.artistsCount = (byte)artists.length;
+	}
+
+	public void setReleaseDate(Date releaseDate) {
+		this.releaseDate = releaseDate;
 	}
 
 	@Override
