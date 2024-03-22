@@ -6,12 +6,13 @@ import java.util.Date;
 import main.java.br.pucminas.aedsiii.Entity.*;
 
 public class App {
-
-	private static String csvFilePath = "songs.csv";
+	private static String csvFilePath = "\\src\\main\\resources\\popularSpotifySongs.csv";
+	private static DataBaseAccess db;
 	
 	@SuppressWarnings("deprecation")
 	private static void uploadData() {
-		TextFileReader base = new TextFileReader(csvFilePath);
+		String path = System.getProperty("user.dir");
+		TextFileReader base = new TextFileReader(path+csvFilePath);
 		base.readLine();
 		
 		MyIO.println("\nImportando base de dados...");
@@ -33,34 +34,19 @@ public class App {
 	}
 	
 	private static boolean addRecord(Music music) {
-		DataBaseAccess db = new DataBaseAccess();
-		boolean success = db.createRecord(music);
-		db.close();
-		return success;
+		return db.createRecord(music);
 	}
 	
 	private static Music readRecord(int id){
-		DataBaseAccess db = new DataBaseAccess();
-		Music music = db.readRecord(id);
-		db.close();
-		
-		return music;
+		return db.readRecord(id);
 	}
 	
 	private static boolean updateRecord(Music music) {
-		DataBaseAccess db = new DataBaseAccess();
-		boolean success = db.updateRecord(music);
-		db.close();
-		
-		return success;
+		return db.updateRecord(music);
 	}
 	
 	private static boolean deleteRecord(int id) {
-		DataBaseAccess db = new DataBaseAccess();
-		boolean success = db.deleteRecord(id);
-		db.close();
-		
-		return success;
+		return db.deleteRecord(id);
 	}
 
 	private static void initalMenu() {
@@ -71,7 +57,7 @@ public class App {
 			MyIO.println("2 - Adicionar nova musica ");
 			MyIO.println("3 - Buscar musica por ID");
 			MyIO.println("4 - Apagar musica por ID");
-			MyIO.println("99 - SAIR");
+			MyIO.println("9 - SAIR");
 			MyIO.print("Selecao: ");
 			option = MyIO.readInt();
 			
@@ -167,10 +153,12 @@ public class App {
 		id = MyIO.readInt("ID da musica: ");
 		boolean success = deleteRecord(id);
 		
-		MyIO.println((success ? "Sucesso ao apagar musica: " : "Falha ao apagar musica: ")+id);
+		MyIO.println((success ? "Sucesso ao apagar musica: " : "Falha ao apagar musica: ")+id+ "\n\n");
 	}
 	
 	public static void main(String[] args) throws Exception {
+		db = new DataBaseAccess();
 		initalMenu();
+		db.close();
 	}
 }

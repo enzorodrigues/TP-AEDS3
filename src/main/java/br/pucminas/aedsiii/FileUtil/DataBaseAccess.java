@@ -12,7 +12,8 @@ public class DataBaseAccess {
 	
 	public DataBaseAccess() {
 		try {
-			db = new RandomAccessFile("data.db", "rw");
+			String path = System.getProperty("user.dir");
+			db = new RandomAccessFile(path+"\\src\\main\\resources\\data.db", "rw");
 		} catch(Exception e) {
 			System.out.println("Error on open database.");
 		}
