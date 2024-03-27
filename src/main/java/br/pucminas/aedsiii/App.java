@@ -66,13 +66,13 @@ public class App {
 					uploadData();
 					break;
 				case 2:
-					createNewMusic();
+					createMusicMenu();
 					break;
 				case 3:
-					searchMusicById();
+					searchMusicByIdMenu();
 					break;
 				case 4:
-					deleteMusicById();
+					deleteMusicByIdMenu();
 					break;
 				case 9:
 					break;
@@ -84,7 +84,7 @@ public class App {
 		MyIO.println("Ate logo...");
 	}
 	
-	private static void createNewMusic() {
+	private static void createMusicMenu() {
 		String name, artists, date;
 		int playlists;
 		short rank;
@@ -105,7 +105,7 @@ public class App {
 		MyIO.println((success? "Musica adicionada a base de dados." : "Parece que houve um erro. Tente novamente.")+"\n\n");
 	}
 	
-	private static void searchMusicById() {
+	private static void searchMusicByIdMenu() {
 		String update;
 		int id;
 		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): BUSCAR MUSICA");
@@ -117,7 +117,7 @@ public class App {
 			MyIO.println(music.toString());
 			update = MyIO.readLine("Atualizar? (S - SIM | N - NAO): ");
 			if(update.equalsIgnoreCase("s")) {
-				updateMusic(music);
+				updateMusicMenu(music);
 			}
 		} else {
 			MyIO.println("ID nao existente na base de dados.");
@@ -125,7 +125,7 @@ public class App {
 		MyIO.println("\n");
 	}
 	
-	private static void updateMusic(Music music) {
+	private static void updateMusicMenu(Music music) {
 		String updates;
 		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): ATUALIZAR MUSICA: " + music.getID());
 		MyIO.println("Nao atualizar -> '...'");
@@ -147,7 +147,7 @@ public class App {
 		MyIO.println("\nMusica Atualizada: "+music.toString());
 	}
 	
-	private static void deleteMusicById() {
+	private static void deleteMusicByIdMenu() {
 		int id;
 		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): APAGAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
