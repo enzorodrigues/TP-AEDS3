@@ -157,6 +157,7 @@ public class App {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		MyIO.setCharset("UTF-8");
 		db = new DataBaseAccess();
 		initalMenu();
 		db.close();

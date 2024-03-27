@@ -16,8 +16,7 @@ public class Music {
 	private short rankSpotifyCharts;
 	private long spotifyStreams;
 	
-	public Music() {
-	}
+	public Music() {}
 	
 	public Music(String name,  String[] artists, byte artistsCount, Date releaseDate, 
 				int inSpotifyPlaylists, short rankSpotifyCharts, long spotifyStreams) {
