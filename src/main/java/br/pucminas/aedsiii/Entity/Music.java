@@ -82,6 +82,13 @@ public class Music {
 				+ " | Spotify Ranking: " + rankSpotifyCharts + " | Spotify Streams: " + spotifyStreams + " ]";
 	}
 	
+	public Music clone() {
+		Music music = new Music(this.name, this.artists.clone(), this.artistsCount, new Date(releaseDate.getTime()), 
+								this.inSpotifyPlaylists, this.rankSpotifyCharts, this.spotifyStreams);
+		music.setID(this.id);
+		return music;
+	}
+	
 	private String artistsToString() {
 		String artists = "[";
 		for(String artist : this.artists) {

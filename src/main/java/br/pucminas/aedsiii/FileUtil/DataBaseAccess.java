@@ -35,17 +35,15 @@ public class DataBaseAccess {
 		}
 	}
 	
-	public Music readRecord(int id) {
+	public MusicDTO readRecord(int id) {
 		if(!recordCanExists(id)) { return null; }
 
 		MusicDTO dto = search(id);
-		return dto != null ? dto.getMusic() : null;
+		return dto != null ? dto : null;
 	}
 	
 	public boolean deleteRecord(int id) {
-		if(!recordCanExists(id)) { return false; }
-		
-		MusicDTO dto = search(id);
+		MusicDTO dto = readRecord(id);
 		if(dto == null) { return false; }
 		
 		try {
@@ -59,12 +57,7 @@ public class DataBaseAccess {
 		return true;
 	}
 	
-	public boolean updateRecord(Music music) {
-		if(!recordCanExists(music.getID())) { return false; }
-		
-		MusicDTO dto = search(music.getID());
-		if(dto == null) { return false; }
-		
+	public boolean updateRecord(Music music, MusicDTO dto) {
 		try {
 			byte[] newMusic = music.toByteArray();
 			byte[] oldMusic = dto.getMusic().toByteArray();

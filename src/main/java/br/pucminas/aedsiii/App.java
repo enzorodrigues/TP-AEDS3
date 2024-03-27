@@ -1,6 +1,8 @@
 package main.java.br.pucminas.aedsiii;
 
 import main.java.br.pucminas.aedsiii.FileUtil.*;
+import main.java.br.pucminas.aedsiii.FileUtil.DTO.MusicDTO;
+
 import java.util.Date;
 
 import main.java.br.pucminas.aedsiii.Entity.*;
@@ -37,12 +39,12 @@ public class App {
 		return db.createRecord(music);
 	}
 	
-	private static Music readRecord(int id){
+	private static MusicDTO readRecord(int id){
 		return db.readRecord(id);
 	}
 	
-	private static boolean updateRecord(Music music) {
-		return db.updateRecord(music);
+	private static boolean updateRecord(Music music, MusicDTO dto) {
+		return db.updateRecord(music, dto);
 	}
 	
 	private static boolean deleteRecord(int id) {
@@ -111,13 +113,13 @@ public class App {
 		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): BUSCAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
 		
-		Music music = readRecord(id);
-		if(music != null) {
-			MyIO.println("ID encontrado:");
-			MyIO.println(music.toString());
+		MusicDTO dto = readRecord(id);
+		if(dto != null) {
+			MyIO.println("ID encontrado:" + id);
+			MyIO.println(dto.getMusic().toString());
 			update = MyIO.readLine("Atualizar? (S - SIM | N - NAO): ");
 			if(update.equalsIgnoreCase("s")) {
-				updateMusicMenu(music);
+				updateMusicMenu(dto);
 			}
 		} else {
 			MyIO.println("ID nao existente na base de dados.");
@@ -125,7 +127,8 @@ public class App {
 		MyIO.println("\n");
 	}
 	
-	private static void updateMusicMenu(Music music) {
+	private static void updateMusicMenu(MusicDTO dto) {
+		Music music = dto.getMusic().clone();
 		String updates;
 		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): ATUALIZAR MUSICA: " + music.getID());
 		MyIO.println("Nao atualizar -> '...'");
@@ -143,8 +146,8 @@ public class App {
 		updates = MyIO.readLine("Streams: ");
 		if(!updates.equals("...")) { music.setSpotifyStreams(Long.parseLong(updates)); }
 		
-		updateRecord(music);
-		MyIO.println("\nMusica Atualizada: "+music.toString());
+		boolean success = updateRecord(music, dto);
+		MyIO.println("\n" + (success? "Musica Atualizada: " : "Falha ao atualizar musica: ") + music.toString());
 	}
 	
 	private static void deleteMusicByIdMenu() {
