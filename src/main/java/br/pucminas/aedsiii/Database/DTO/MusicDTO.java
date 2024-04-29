@@ -1,4 +1,4 @@
-package main.java.br.pucminas.aedsiii.FileUtil.DTO;
+package main.java.br.pucminas.aedsiii.Database.DTO;
 
 import main.java.br.pucminas.aedsiii.Entity.Music;
 

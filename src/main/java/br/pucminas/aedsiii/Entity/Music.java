@@ -1,10 +1,12 @@
 package main.java.br.pucminas.aedsiii.Entity;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
 
 public class Music {
 	private int id = -1;

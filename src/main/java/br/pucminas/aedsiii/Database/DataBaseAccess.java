@@ -1,36 +1,41 @@
-package main.java.br.pucminas.aedsiii.FileUtil;
+package main.java.br.pucminas.aedsiii.Database;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
+import main.java.br.pucminas.aedsiii.Database.DTO.MusicDTO;
 import main.java.br.pucminas.aedsiii.Entity.Music;
-import main.java.br.pucminas.aedsiii.FileUtil.DTO.MusicDTO;
+import main.java.br.pucminas.aedsiii.Indexes.Index;
+import main.java.br.pucminas.aedsiii.Indexes.BTree.BTree;
 
 public class DataBaseAccess {
 	private static char GRAVESTONE_SIGNAL = '*';
 	private RandomAccessFile db;
+	private BTree indexDB = new BTree();
 	
 	public DataBaseAccess() {
 		try {
 			String path = System.getProperty("user.dir");
 			db = new RandomAccessFile(path+"\\src\\main\\resources\\data.db", "rw");
 		} catch(Exception e) {
-			System.out.println("Error on open database.");
+			System.err.println("Error on open database.");
 		}
 	}
 	
 	public boolean createRecord(Music music) {
 		try {
 			music.setID(getID());
-			db.seek(db.length());
+			long address = db.length();
+			db.seek(address);
 			
 			byte[] musicByteArray = music.toByteArray();
 			db.writeChar(' ');
 			db.writeInt(musicByteArray.length);
 			db.write(musicByteArray);
+			indexDB.insert(new Index(music.getID(), address));
 			return true;
 		} catch (Exception e) {
-			System.out.println("Error on create record to: "+music);
+			System.err.println("Error on create record to: "+music);
 			return false;
 		}
 	}
@@ -50,7 +55,7 @@ public class DataBaseAccess {
 			db.seek(dto.getGravestonePointer());
 			db.writeChar(GRAVESTONE_SIGNAL);
 		} catch(IOException e) {
-			System.out.println("Error on delete record: "+id);
+			System.err.println("Error on delete record: "+id);
 			return false;
 		}
 		
@@ -74,7 +79,7 @@ public class DataBaseAccess {
 			
 			db.write(newMusic);
 		} catch(IOException e) {
-			System.out.println("Error on update record: "+music);
+			System.err.println("Error on update record: "+music);
 			return false;
 		}
 		
@@ -84,10 +89,10 @@ public class DataBaseAccess {
 	public void close() {
 		try {
 			db.close();
+			indexDB.close();
 		} catch(Exception e) {
-			System.out.println("Error on closing database.");
+			System.err.println("Error on closing database.");
 		}
-		
 	}
 	
 	// MARK: - Private Functions
@@ -95,34 +100,55 @@ public class DataBaseAccess {
 	private MusicDTO search(int id) {
 		int size;
 		long recordPointer, gravestonePointer;
-		byte [] recording;
+		byte[] recording;
 		boolean EOF = false;
 		Music music = new Music();
+		long address = indexDB.find(id);
+		
+		try {
+			db.seek(address);
+			gravestonePointer = db.getFilePointer();
+			char gravestone = db.readChar();
+			
+			size = db.readInt();
+			
+			recordPointer = db.getFilePointer();
+			recording = new byte[size];
 
-		while(!EOF) {
-			try {
-				gravestonePointer = db.getFilePointer();
-				char gravestone = db.readChar();
-				
-				size = db.readInt();
-				
-				recordPointer = db.getFilePointer();
-				recording = new byte[size];
-
-				db.read(recording);
-				if(gravestone != GRAVESTONE_SIGNAL) {
-					music.fromByteArray(recording);
-					if(music.getID() == id) { 
-						return new MusicDTO(music, gravestonePointer, recordPointer);
-					}
-				}
-			} catch (EOFException e) { 
-				EOF = true; 
-			} catch(IOException e) {
-				System.out.println("Error on searching music: "+ e);
-				return null;
+			db.read(recording);
+			if(gravestone != GRAVESTONE_SIGNAL) {
+				music.fromByteArray(recording);
+				return new MusicDTO(music, gravestonePointer, recordPointer);
 			}
+		} catch (Exception e) { 
+			System.err.println("Erro ao procurar id: "+address+" - "+ id);
+			return null; 
 		}
+
+//		while(!EOF) {
+//			try {
+//				gravestonePointer = db.getFilePointer();
+//				char gravestone = db.readChar();
+//				
+//				size = db.readInt();
+//				
+//				recordPointer = db.getFilePointer();
+//				recording = new byte[size];
+//
+//				db.read(recording);
+//				if(gravestone != GRAVESTONE_SIGNAL) {
+//					music.fromByteArray(recording);
+//					if(music.getID() == id) { 
+//						return new MusicDTO(music, gravestonePointer, recordPointer);
+//					}
+//				}
+//			} catch (EOFException e) { 
+//				EOF = true; 
+//			} catch(IOException e) {
+//				System.out.println("Error on searching music: "+ e);
+//				return null;
+//			}
+//		}
 		
 		return null;
 	}
@@ -136,7 +162,7 @@ public class DataBaseAccess {
 				return false;
 			}
 		} catch(IOException e) {
-			System.out.println("Error on validate ID.");
+			System.err.println("Error on validate ID.");
 			return false;
 		}
 		

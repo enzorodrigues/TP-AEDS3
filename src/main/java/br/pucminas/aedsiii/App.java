@@ -1,11 +1,11 @@
 package main.java.br.pucminas.aedsiii;
 
-import main.java.br.pucminas.aedsiii.FileUtil.*;
-import main.java.br.pucminas.aedsiii.FileUtil.DTO.MusicDTO;
-
 import java.util.Date;
 
-import main.java.br.pucminas.aedsiii.Entity.*;
+import main.java.br.pucminas.aedsiii.Database.DataBaseAccess;
+import main.java.br.pucminas.aedsiii.Database.DTO.MusicDTO;
+import main.java.br.pucminas.aedsiii.Entity.Music;
+import main.java.br.pucminas.aedsiii.FileUtil.TextFileReader;
 
 public class App {
 	private static String csvFilePath = "\\src\\main\\resources\\popularSpotifySongs.csv";
@@ -18,21 +18,40 @@ public class App {
 		base.readLine();
 		
 		MyIO.println("\nImportando base de dados...");
+		String[] musicData;
+		String date;
+		Music music;
+		int total=0;
 		
 		String line = base.readLine();
 		while(line != null) {
-			String [] musicData = line.split(";");
-			String date = musicData[3]+"/"+musicData[4]+"/"+musicData[5];
+			musicData = line.split(";");
+			date = musicData[3]+"/"+musicData[4]+"/"+musicData[5];
 			
-			Music music = new Music(musicData[0], musicData[1].split(","), Byte.parseByte(musicData[2]),
+			music = new Music(musicData[0], musicData[1].split(","), Byte.parseByte(musicData[2]),
 									new Date(date), Integer.parseInt(musicData[6]), 
 									Short.parseShort(musicData[7]), Long.parseLong(musicData[8]));
 			addRecord(music);
+			total++;
+			if(total ==95) {
+				break;
+			}
 			line = base.readLine();
 		}
-
 		base.close();
-		MyIO.println("Sucesso na importacao do .cvs para base de dados!\n");
+		MyIO.println("Sucesso na importacao do .csv para base de dados! Total: "+total+" registros.\n");
+	}
+	
+	private static void list() {
+		for(int i=0; i<95; i++) {
+			MusicDTO dto = readRecord(i);
+			if(dto != null) {
+				MyIO.println("ID encontrado: " + i);
+				MyIO.println(dto.getMusic().toString());
+			} else {
+				MyIO.println("ID nao existente na base de dados.");
+			}
+		}
 	}
 	
 	private static boolean addRecord(Music music) {
@@ -77,6 +96,7 @@ public class App {
 					deleteMusicByIdMenu();
 					break;
 				case 9:
+					list();
 					break;
 				default:
 					MyIO.println("OPCAO INVALIDA");
