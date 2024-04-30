@@ -6,12 +6,12 @@ import java.io.RandomAccessFile;
 import main.java.br.pucminas.aedsiii.Database.DTO.MusicDTO;
 import main.java.br.pucminas.aedsiii.Entity.Music;
 import main.java.br.pucminas.aedsiii.Indexes.Index;
-import main.java.br.pucminas.aedsiii.Indexes.BTree.BTree;
+import main.java.br.pucminas.aedsiii.Indexes.BTree.BStarTree;
 
 public class DataBaseAccess {
 	private static char GRAVESTONE_SIGNAL = '*';
 	private RandomAccessFile db;
-	private BTree indexDB = new BTree();
+	private BStarTree indexDB = new BStarTree();
 	
 	public DataBaseAccess() {
 		try {

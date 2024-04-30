@@ -6,11 +6,11 @@ import java.io.RandomAccessFile;
 import main.java.br.pucminas.aedsiii.Indexes.Index;
 import main.java.br.pucminas.aedsiii.Indexes.BTree.DTO.IndexDTO;
 
-public class BTree {
+public class BStarTree {
 	protected static int ORDER = 10;
 	private RandomAccessFile db;
 	
-	public BTree() {
+	public BStarTree() {
 		try {
 			String path = System.getProperty("user.dir");
 			db = new RandomAccessFile(path+"\\src\\main\\resources\\index.db", "rwd");
@@ -64,12 +64,15 @@ public class BTree {
 	}
 	
 	private IndexDTO insertIntoPage(Node page, long address, Index i, long rightChild) {
-		if(page.size < BTree.ORDER-1) {
+		if(page.size < BStarTree.ORDER-1) {
 			page.addIndex(i);
 			page.addChild(rightChild);
 			savePage(page, address);
 			return null;
 		} else {
+			if(page.fatherAddress != -1 && sendToSister(page, address, i, rightChild)) {
+				return null;
+			}
 			return splitPage(page, address, i, rightChild);
 		}
 	}
@@ -83,8 +86,38 @@ public class BTree {
 		long newAddress = getLastAddress();
 		savePage(page, address);
 		savePage(newPage, newAddress);
+		if(!page.isLeaf) {
+			defineNewFatherToChildPages(newPage, newAddress);
+		}
 		
 		return new IndexDTO(in, address, newAddress);
+	}
+	
+	private boolean sendToSister(Node page, long address, Index i, long rightChild) {
+		long fatherAddress = page.fatherAddress;
+		Node father = getPage(fatherAddress);
+		long sisterAddress = father.getPenultimateChild();
+		Node sister = getPage(sisterAddress);
+		
+		boolean canDonate = Node.sendToSister(father, sister, page);
+		
+		if(canDonate) {
+			page.addIndex(i);
+			page.addChild(rightChild);
+			
+			savePage(sister, sisterAddress);
+			savePage(father, fatherAddress);
+			savePage(page, address);
+			
+			if(!page.isLeaf) {
+				long newSisterChildAddress = sister.getLastChild();
+				Node newSisterChild = getPage(newSisterChildAddress);
+				newSisterChild.fatherAddress = sisterAddress;
+				savePage(newSisterChild, newSisterChildAddress);
+			}
+		}
+		
+		return canDonate;
 	}
 	
 	// MARK: - FIND
@@ -95,6 +128,9 @@ public class BTree {
 	}
 	
 	private long find(Node page, int id) {
+		if(id == 95) {
+			//System.out.println("id 14");
+		}
 		while(page != null) {
 			if(id > page.getLastIndex().getId()) {
 				page = getPage(page.getLastChild());

@@ -62,14 +62,16 @@ public class Index {
     }
 	
 	
-	public void fromByteArray(byte[] b) {
+	public static Index fromByteArray(byte[] b) {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
         DataInputStream dis = new DataInputStream(bais);
+        Index i = new Index();
         try {
-	        this.id = dis.readInt();
-	        this.address = dis.readLong();
+	        i.id = dis.readInt();
+	        i.address = dis.readLong();
 		} catch(Exception e) {
 	    	System.out.println("Erro ao converter byte array para index.");
 	    }
+        return i;
 	}
 }
