@@ -14,24 +14,24 @@ public class BTree {
 		try {
 			String path = System.getProperty("user.dir");
 			db = new RandomAccessFile(path+"\\src\\main\\resources\\index.db", "rwd");
-			initTree(db.length() != 0);
+			if(db.length() == 0) {
+				initTree();
+			}
 		} catch(Exception e) {
 			System.out.println("Error on open indexes.");
 		}
 	}
 	
-	private void initTree(boolean BTree_Created) throws IOException {
-		if(!BTree_Created) {
-			db.seek(0);
-			db.writeLong(8);
-			db.write(new Node().toByteArray());
-			db.getChannel().force(false);
-			db.getFD().sync();
-		}
+	private void initTree() throws IOException {
+		db.seek(0);
+		db.writeLong(8);
+		db.write(new Node().toByteArray());
+		db.getChannel().force(false);
+		db.getFD().sync();
 	}
 
 	// MARK: - INSERT
-	public void insert(Index i) {
+	public void insertIndex(Index i) {
 		long address = getRootAddress();
 		Node firstPage = getPage(address);
 		IndexDTO newRoot = insert(firstPage, address, i);
@@ -39,9 +39,6 @@ public class BTree {
 	}
 	
 	private IndexDTO insert(Node page, long address, Index i) {
-		if(i.getId() == 94) {
-			System.out.println("95");
-		}
 		IndexDTO promoted = null;
 		while(page != null) {
 			if(page.isLeaf) {
@@ -91,8 +88,7 @@ public class BTree {
 	}
 	
 	// MARK: - FIND
-	
-	public long find(int id) {
+	public long findIndex(int id) {
 		long address = getRootAddress();
 		Node firstPage = getPage(address);
 		return find(firstPage, id);
@@ -118,6 +114,38 @@ public class BTree {
 		return -4;
 	}
 
+	// MARK: - UPDATE
+	public boolean updateIndex(int id, long newAdress) {
+		long address = getRootAddress();
+		Node page = getPage(address);
+		
+		while(page != null) {
+			if(id > page.getLastIndex().getId()) {
+				address = page.getLastChild();
+				page = getPage(address);
+				continue;
+			}
+			
+			for(byte i=0; i<page.size; i++) {
+				if(id == page.indexes[i].getId()) {
+					page.indexes[i].setAddress(newAdress);
+					savePage(page, address);
+					return true;
+				}
+				else if(id < page.indexes[i].getId()) {
+					page = getPage(page.children[i]);
+					break;
+				}
+			}
+		}
+		return false;
+	}
+
+	// MARK: - DELETE
+	public void deleteIndex() {
+		
+	}
+	
 	// MARK - Utils
 	
 	// Pages - Get/Save

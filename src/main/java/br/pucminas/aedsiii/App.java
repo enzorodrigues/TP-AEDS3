@@ -33,9 +33,9 @@ public class App {
 									Short.parseShort(musicData[7]), Long.parseLong(musicData[8]));
 			addRecord(music);
 			total++;
-			if(total ==95) {
-				break;
-			}
+//			if(total ==95) {
+//				break;
+//			}
 			line = base.readLine();
 		}
 		base.close();
@@ -96,7 +96,7 @@ public class App {
 					deleteMusicByIdMenu();
 					break;
 				case 9:
-					list();
+					//list();
 					break;
 				default:
 					MyIO.println("OPCAO INVALIDA");

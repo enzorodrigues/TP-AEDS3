@@ -32,7 +32,7 @@ public class DataBaseAccess {
 			db.writeChar(' ');
 			db.writeInt(musicByteArray.length);
 			db.write(musicByteArray);
-			indexDB.insert(new Index(music.getID(), address));
+			indexDB.insertIndex(new Index(music.getID(), address));
 			return true;
 		} catch (Exception e) {
 			System.err.println("Error on create record to: "+music);
@@ -69,15 +69,17 @@ public class DataBaseAccess {
 			
 			if(newMusic.length <= oldMusic.length) {
 				db.seek(dto.getRecordPointer());
+				db.write(newMusic);
 			} else {
 				db.seek(dto.getGravestonePointer());
 				db.writeChar(GRAVESTONE_SIGNAL);
-				db.seek(db.length());
+				long newAddress = db.length();
+				db.seek(newAddress);
 				db.writeChar(' ');
 				db.writeInt(newMusic.length);
+				db.write(newMusic);
+				indexDB.updateIndex(music.getID(), newAddress);
 			}
-			
-			db.write(newMusic);
 		} catch(IOException e) {
 			System.err.println("Error on update record: "+music);
 			return false;
@@ -101,9 +103,8 @@ public class DataBaseAccess {
 		int size;
 		long recordPointer, gravestonePointer;
 		byte[] recording;
-		boolean EOF = false;
 		Music music = new Music();
-		long address = indexDB.find(id);
+		long address = indexDB.findIndex(id);
 		
 		try {
 			db.seek(address);
@@ -122,34 +123,8 @@ public class DataBaseAccess {
 			}
 		} catch (Exception e) { 
 			System.err.println("Erro ao procurar id: "+address+" - "+ id);
-			return null; 
 		}
 
-//		while(!EOF) {
-//			try {
-//				gravestonePointer = db.getFilePointer();
-//				char gravestone = db.readChar();
-//				
-//				size = db.readInt();
-//				
-//				recordPointer = db.getFilePointer();
-//				recording = new byte[size];
-//
-//				db.read(recording);
-//				if(gravestone != GRAVESTONE_SIGNAL) {
-//					music.fromByteArray(recording);
-//					if(music.getID() == id) { 
-//						return new MusicDTO(music, gravestonePointer, recordPointer);
-//					}
-//				}
-//			} catch (EOFException e) { 
-//				EOF = true; 
-//			} catch(IOException e) {
-//				System.out.println("Error on searching music: "+ e);
-//				return null;
-//			}
-//		}
-		
 		return null;
 	}
 	
