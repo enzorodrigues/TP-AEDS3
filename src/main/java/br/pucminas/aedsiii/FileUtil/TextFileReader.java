@@ -13,7 +13,7 @@ public class TextFileReader {
 			file = new BufferedReader(new FileReader(filePath));
 		}
 		catch (FileNotFoundException e) {
-			System.out.println("File not found");
+			System.err.println("File not found");
 		}
 	}
 	
@@ -22,7 +22,7 @@ public class TextFileReader {
 			file.close();
 		}
 		catch (IOException e) {
-			System.out.println("Error on close text file: " + e);	
+			System.err.println("Error on close text file: " + e);	
 		}
 	}
 	
@@ -34,7 +34,7 @@ public class TextFileReader {
 		try {
 			text = file.readLine();
 		} catch (Exception e) {
-			System.out.println("Error on read line: " + e);
+			System.err.println("Error on read line: " + e);
 		}
 		finally {
 			return text;

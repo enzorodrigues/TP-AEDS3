@@ -10,7 +10,6 @@ import main.java.br.pucminas.aedsiii.FileUtil.TextFileReader;
 public class App {
 	private static String csvFilePath = "\\src\\main\\resources\\popularSpotifySongs.csv";
 	private static DataBaseAccess db;
-	private static int max = 110;
 	
 	@SuppressWarnings("deprecation")
 	private static void uploadData() {
@@ -34,9 +33,6 @@ public class App {
 									Short.parseShort(musicData[7]), Long.parseLong(musicData[8]));
 			addRecord(music);
 			total++;
-//			if(total == max) {
-//				break;
-//			}
 			line = base.readLine();
 		}
 		base.close();
@@ -44,7 +40,7 @@ public class App {
 	}
 	
 	private static void list() {
-		for(int i=0; i<max; i++) {
+		for(int i=0; i<951; i++) {
 			MusicDTO dto = readRecord(i);
 			if(dto != null) {
 				MyIO.println("ID encontrado: " + i);

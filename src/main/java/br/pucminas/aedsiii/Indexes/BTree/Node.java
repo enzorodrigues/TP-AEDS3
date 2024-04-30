@@ -42,7 +42,7 @@ public class Node {
         	}
         	dos.writeLong(children[max]);
         } catch(Exception e) {
-        	System.out.println("Erro ao converter node para byte array.");
+        	System.err.println("Erro ao converter node para byte array.");
         }
         
         return baos.toByteArray();
@@ -66,7 +66,7 @@ public class Node {
 	        node.isLeaf = node.children[0] == -1;
 	        return node;
 		} catch(Exception e) {
-	    	System.out.println("Erro ao converter byte array para index.");
+			System.err.println("Erro ao converter byte array para Node.");
 	    	return null;
 	    }
 	}

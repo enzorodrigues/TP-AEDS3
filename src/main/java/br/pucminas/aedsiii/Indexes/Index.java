@@ -55,7 +55,7 @@ public class Index {
         	dos.writeInt(this.id);
             dos.writeLong(this.address);
         } catch(Exception e) {
-        	System.out.println("Erro ao converter index para byte array.");
+        	System.err.println("Erro ao converter index para byte array.");
         }
         
         return baos.toByteArray();
@@ -70,7 +70,7 @@ public class Index {
 	        i.id = dis.readInt();
 	        i.address = dis.readLong();
 		} catch(Exception e) {
-	    	System.out.println("Erro ao converter byte array para index.");
+			System.err.println("Erro ao converter byte array para index.");
 	    }
         return i;
 	}

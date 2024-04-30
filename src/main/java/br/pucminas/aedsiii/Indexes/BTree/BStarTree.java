@@ -18,7 +18,7 @@ public class BStarTree {
 				initTree();
 			}
 		} catch(Exception e) {
-			System.out.println("Error on open indexes.");
+			System.err.println("Error on open indexes.");
 		}
 	}
 	
@@ -26,8 +26,6 @@ public class BStarTree {
 		db.seek(0);
 		db.writeLong(8);
 		db.write(new Node().toByteArray());
-		db.getChannel().force(false);
-		db.getFD().sync();
 	}
 
 	// MARK: - INSERT
@@ -128,9 +126,6 @@ public class BStarTree {
 	}
 	
 	private long find(Node page, int id) {
-		if(id == 95) {
-			//System.out.println("id 14");
-		}
 		while(page != null) {
 			if(id > page.getLastIndex().getId()) {
 				page = getPage(page.getLastChild());
@@ -192,7 +187,6 @@ public class BStarTree {
 			db.read(pageByteArray);
 			return Node.fromByteArray(pageByteArray);
 		} catch(Exception e) {
-			//System.out.println("Erro ao obter pagina! Address: "+address+"\n\n");
 			return null;
 		}
 	}
@@ -201,10 +195,8 @@ public class BStarTree {
 		try {
 			db.seek(address);
 			db.write(page.toByteArray());
-			db.getChannel().force(false);
-			db.getFD().sync();
 		} catch(Exception e) {
-			System.out.println("Erro ao salvar pagina!");
+			System.err.println("Erro ao salvar pagina!");
 		}
 	}
 	
@@ -214,7 +206,7 @@ public class BStarTree {
 			db.seek(0);
 			return db.readLong();
 		} catch(Exception e) {
-			System.out.println("Erro ao obter raiz!");
+			System.err.println("Erro ao obter raiz!");
 			return -1;
 		}
 	}
@@ -223,10 +215,8 @@ public class BStarTree {
 		try {
 			db.seek(0);
 			db.writeLong(rootAddress);
-			db.getChannel().force(false);
-			db.getFD().sync();
 		} catch(Exception e) {
-			System.out.println("Erro ao definir raiz!");
+			System.err.println("Erro ao definir raiz!");
 		}
 	}
 	
@@ -256,7 +246,7 @@ public class BStarTree {
 		try {
 			return db.length();
 		} catch (Exception e) {
-			System.out.println("Fim do arquivo");
+			System.err.println("Fim do arquivo");
 			return -1;
 		}
 	}
@@ -266,7 +256,7 @@ public class BStarTree {
 		try {
 			db.close();
 		} catch (Exception e) {
-			System.out.println("Erro ao fechar indices");
+			System.err.println("Erro ao fechar indices");
 		}
 	}
 }
