@@ -17,9 +17,6 @@ class MyIO {
       in = new BufferedReader(new InputStreamReader(System.in, Charset.forName(charset)));
    }
 
-   public static void print(){
-   }
-
    public static void print(int x){
       try {
          PrintStream out = new PrintStream(System.out, true, charset);
@@ -56,6 +53,7 @@ class MyIO {
    }
 
    public static void println(){
+	   println("");
    }
 
    public static void println(int x){

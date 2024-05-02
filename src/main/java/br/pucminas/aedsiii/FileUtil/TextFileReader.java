@@ -5,9 +5,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * Classe utilitaria para leitura de um arquivo texto
+ * 
+ * @since TP01
+ */
 public class TextFileReader {
 	private BufferedReader file;
 	
+	/**
+	 * Instancia a conexao com o arquivo para leitura
+	 * @param filePath - Caminho absoluto do arquivo
+	 */
 	public TextFileReader(String filePath) {	
 		try {
 			file = new BufferedReader(new FileReader(filePath));
@@ -17,6 +26,9 @@ public class TextFileReader {
 		}
 	}
 	
+	/**
+	 * Fecha a conexao com o arquivo
+	 */
 	public void close() {
 		try {
 			file.close();
@@ -26,6 +38,10 @@ public class TextFileReader {
 		}
 	}
 	
+	/**
+	 * Realiza a leitura de uma linha do arquivo
+	 * @return String - Conteudo obtido da linha
+	 */
 	@SuppressWarnings("finally")
 	public String readLine() {
 		

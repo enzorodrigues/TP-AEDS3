@@ -14,16 +14,20 @@ import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.InvertedList;
 public class DataBaseAccess {
 	private static char GRAVESTONE_SIGNAL = '*';
 	private static String SPLIT_SIGNAL = " ";
+	private static String ARTISTS_SPLIT_SIGNAL = ", ";
 	
 	private RandomAccessFile db;
 	private BStarTree indexDB = new BStarTree();
-	private InvertedList artistIndex = new InvertedList("artists.db");
-	private InvertedList musicNameIndex = new InvertedList("name.db");
+	private InvertedList artistIndex = new InvertedList("artists.db", (byte)50);
+	private InvertedList musicNameIndex = new InvertedList("name.db", (byte)50);
 
 	public DataBaseAccess() {
 		try {
 			String path = System.getProperty("user.dir");
 			db = new RandomAccessFile(path+"\\src\\main\\resources\\data.db", "rw");
+			if(db.length() == 0) {
+				db.writeInt(-1);
+			}
 		} catch(Exception e) {
 			System.err.println("Error on open database.");
 		}
@@ -54,7 +58,7 @@ public class DataBaseAccess {
 		
 		musicNameIndex.createTerms(music.getName().split(SPLIT_SIGNAL), music.getID());
 		
-		artistIndex.createTerms(music.artistsConcat().split(SPLIT_SIGNAL), music.getID());
+		artistIndex.createTerms(music.artistsConcat().split(ARTISTS_SPLIT_SIGNAL), music.getID());
 	}
 	
 	public MusicDTO readRecord(int id) {
@@ -72,7 +76,7 @@ public class DataBaseAccess {
 			db.seek(dto.getGravestonePointer());
 			db.writeChar(GRAVESTONE_SIGNAL);
 			artistIndex.deleteIdFromTerms(dto.getMusic().artistsConcat().split(SPLIT_SIGNAL), id);
-			musicNameIndex.deleteIdFromTerms(dto.getMusic().getName().split(SPLIT_SIGNAL), id);
+			musicNameIndex.deleteIdFromTerms(dto.getMusic().getName().split(ARTISTS_SPLIT_SIGNAL), id);
 		} catch(IOException e) {
 			System.err.println("Error on delete record: "+id);
 			return false;
@@ -106,8 +110,8 @@ public class DataBaseAccess {
 			}
 			
 			if(!music.artistsConcat().equalsIgnoreCase(dto.getMusic().artistsConcat())) {
-				updateIndexes(artistIndex, dto.getMusic().artistsConcat().split(SPLIT_SIGNAL), 
-						  	  music.artistsConcat().split(SPLIT_SIGNAL), music.getID());
+				updateIndexes(artistIndex, dto.getMusic().artistsConcat().split(ARTISTS_SPLIT_SIGNAL), 
+						  	  music.artistsConcat().split(ARTISTS_SPLIT_SIGNAL), music.getID());
 			}
 			
 		} catch(IOException e) {
@@ -194,7 +198,6 @@ public class DataBaseAccess {
 	}
 		
 	// MARK: - Private Functions
-
 	
 	private MusicDTO search(int id) {
 		int size;
@@ -219,17 +222,16 @@ public class DataBaseAccess {
 				return new MusicDTO(music, gravestonePointer, recordPointer);
 			}
 		} catch (Exception e) { 
-			System.err.println("Erro ao procurar id: "+address+" - "+ id);
+			System.err.println("Erro ao procurar id: "+ id +" - endereco: "+address);
 		}
 
 		return null;
 	}
-	
 
 	private boolean recordCanExists(int id) {
 		try {
 			db.seek(0);
-			int lastId = !isEmpty() ? db.readInt() : 0;
+			int lastId = db.readInt();
 			if(id > lastId) {
 				System.out.println("ID cannot exists. ID greater than the last ID.");
 				return false;
@@ -242,22 +244,11 @@ public class DataBaseAccess {
 		return true;
 	}
 
-
 	private int getID() throws IOException {
 		db.seek(0);
-		if(isEmpty()) {
-			db.writeInt(0);
-			return 0;
-		} else {
-			int id = db.readInt()+1;
-			db.seek(0);
-			db.writeInt(id);
-			return id;
-		}
-	}
-	
-
-	private boolean isEmpty() throws IOException {
-		return db.length() == 0;
+		int id = db.readInt()+1;
+		db.seek(0);
+		db.writeInt(id);
+		return id;
 	}
 }
