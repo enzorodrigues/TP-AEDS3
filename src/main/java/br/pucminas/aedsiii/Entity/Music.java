@@ -43,7 +43,6 @@ public class Music {
 		this.releaseDate = date;
 	}
 	
-
 	public void setID(int id) {
 		this.id = id;
 	}
@@ -99,6 +98,10 @@ public class Music {
 		artists+= "]";
 		return artists.replaceFirst(", ", "");
 	}
+	
+	public String artistsConcat() {
+		return artistsToString().replace("[", "").replace("]", "");
+	}
 
 	private String dateToString() {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -124,8 +127,7 @@ public class Music {
         dos.writeLong(this.spotifyStreams);
         return baos.toByteArray();
     }
-	
-	
+
 	public void fromByteArray(byte[] b) throws IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
         DataInputStream dis = new DataInputStream(bais);
@@ -143,6 +145,14 @@ public class Music {
         this.rankSpotifyCharts = dis.readShort();
         this.spotifyStreams = dis.readLong();
 	}
-    
+
 	
+	public String getName() {
+		return name;
+	}
+	
+
+	public String[] getArtists() {
+		return artists;
+	}
 }

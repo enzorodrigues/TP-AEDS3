@@ -13,7 +13,7 @@ public class BStarTree {
 	public BStarTree() {
 		try {
 			String path = System.getProperty("user.dir");
-			db = new RandomAccessFile(path+"\\src\\main\\resources\\index.db", "rwd");
+			db = new RandomAccessFile(path+"\\src\\main\\resources\\indexes\\index.db", "rwd");
 			if(db.length() == 0) {
 				initTree();
 			}

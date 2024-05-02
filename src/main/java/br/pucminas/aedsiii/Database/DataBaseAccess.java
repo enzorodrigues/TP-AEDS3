@@ -2,17 +2,24 @@ package main.java.br.pucminas.aedsiii.Database;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import main.java.br.pucminas.aedsiii.Database.DTO.MusicDTO;
 import main.java.br.pucminas.aedsiii.Entity.Music;
 import main.java.br.pucminas.aedsiii.Indexes.Index;
 import main.java.br.pucminas.aedsiii.Indexes.BTree.BStarTree;
+import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.InvertedList;
 
 public class DataBaseAccess {
 	private static char GRAVESTONE_SIGNAL = '*';
+	private static String SPLIT_SIGNAL = " ";
+	
 	private RandomAccessFile db;
 	private BStarTree indexDB = new BStarTree();
-	
+	private InvertedList artistIndex = new InvertedList("artists.db");
+	private InvertedList musicNameIndex = new InvertedList("name.db");
+
 	public DataBaseAccess() {
 		try {
 			String path = System.getProperty("user.dir");
@@ -32,7 +39,9 @@ public class DataBaseAccess {
 			db.writeChar(' ');
 			db.writeInt(musicByteArray.length);
 			db.write(musicByteArray);
-			indexDB.insertIndex(new Index(music.getID(), address));
+
+			indexing(music, address);
+
 			return true;
 		} catch (Exception e) {
 			System.err.println("Error on create record to: "+music);
@@ -40,11 +49,19 @@ public class DataBaseAccess {
 		}
 	}
 	
+	private void indexing(Music music, long address) {
+		indexDB.insertIndex(new Index(music.getID(), address));
+		
+		musicNameIndex.createTerms(music.getName().split(SPLIT_SIGNAL), music.getID());
+		
+		artistIndex.createTerms(music.artistsConcat().split(SPLIT_SIGNAL), music.getID());
+	}
+	
 	public MusicDTO readRecord(int id) {
 		if(!recordCanExists(id)) { return null; }
 
 		MusicDTO dto = search(id);
-		return dto != null ? dto : null;
+		return dto;
 	}
 	
 	public boolean deleteRecord(int id) {
@@ -54,6 +71,8 @@ public class DataBaseAccess {
 		try {
 			db.seek(dto.getGravestonePointer());
 			db.writeChar(GRAVESTONE_SIGNAL);
+			artistIndex.deleteIdFromTerms(dto.getMusic().artistsConcat().split(SPLIT_SIGNAL), id);
+			musicNameIndex.deleteIdFromTerms(dto.getMusic().getName().split(SPLIT_SIGNAL), id);
 		} catch(IOException e) {
 			System.err.println("Error on delete record: "+id);
 			return false;
@@ -80,6 +99,17 @@ public class DataBaseAccess {
 				db.write(newMusic);
 				indexDB.updateIndex(music.getID(), newAddress);
 			}
+			
+			if(!music.getName().equalsIgnoreCase(dto.getMusic().getName())) {
+				updateIndexes(musicNameIndex, dto.getMusic().getName().split(SPLIT_SIGNAL), 
+							  music.getName().split(SPLIT_SIGNAL), music.getID());
+			}
+			
+			if(!music.artistsConcat().equalsIgnoreCase(dto.getMusic().artistsConcat())) {
+				updateIndexes(artistIndex, dto.getMusic().artistsConcat().split(SPLIT_SIGNAL), 
+						  	  music.artistsConcat().split(SPLIT_SIGNAL), music.getID());
+			}
+			
 		} catch(IOException e) {
 			System.err.println("Error on update record: "+music);
 			return false;
@@ -92,13 +122,80 @@ public class DataBaseAccess {
 		try {
 			db.close();
 			indexDB.close();
+			musicNameIndex.close();
+			artistIndex.close();
 		} catch(Exception e) {
 			System.err.println("Error on closing database.");
 		}
 	}
 	
+	public void searchByMusicNameAndArtists(String[] nameTerms, String[] artistTerms) {
+		Integer[] nameIDs = musicNameIndex.searchTerm(nameTerms);
+		Integer[] artistIDs = artistIndex.searchTerm(artistTerms);
+		
+		HashSet<Integer> equals = new HashSet<Integer>(Arrays.asList(nameIDs));
+		equals.retainAll(Arrays.asList(artistIDs));
+		
+		MusicDTO dto;
+		for(int id: equals) {
+			dto = search(id);
+			if(dto != null) {
+				System.out.println(dto.getMusic().toString()); 
+			}
+		}
+	}
+	
+	public void searchByMusicName(String[] terms) {
+		MusicDTO dto;
+		Integer[] ids = musicNameIndex.searchTerm(terms);
+		for(int id: ids) {
+			dto = search(id);
+			if(dto != null) {
+				System.out.println(dto.getMusic().toString()); 
+			}
+		}
+	}
+	
+	public void searchByArtistName(String[] terms) {
+		MusicDTO dto;
+		Integer[] ids = artistIndex.searchTerm(terms);
+		for(int id: ids) {
+			dto = search(id);
+			if(dto != null) {
+				System.out.println(dto.getMusic().toString()); 
+			}
+		}
+	}
+	
+	private void updateIndexes(InvertedList index, String[] oldTerms, String[] newTerms, int id) {
+		HashSet<String> oldUniques = new HashSet<String>(Arrays.asList(oldTerms));
+		HashSet<String> newUniques = new HashSet<String>(Arrays.asList(newTerms));
+		HashSet<String> equals = new HashSet<String>();
+
+		equals.addAll(Arrays.asList(oldTerms));
+		equals.retainAll(Arrays.asList(newTerms));
+
+		oldUniques.removeAll(equals);
+		newUniques.removeAll(equals);
+		equals.clear();
+		equals = null;
+
+		oldTerms = new String[oldUniques.size()];
+		oldUniques.toArray(oldTerms);
+		oldUniques.clear();
+		oldUniques = null;
+
+		newTerms = new String[newUniques.size()];
+		newUniques.toArray(newTerms);
+		newUniques.clear();
+		newUniques = null;
+		
+		index.updateTerms(oldTerms, newTerms, id);
+	}
+		
 	// MARK: - Private Functions
 
+	
 	private MusicDTO search(int id) {
 		int size;
 		long recordPointer, gravestonePointer;
@@ -128,6 +225,7 @@ public class DataBaseAccess {
 		return null;
 	}
 	
+
 	private boolean recordCanExists(int id) {
 		try {
 			db.seek(0);
@@ -144,6 +242,7 @@ public class DataBaseAccess {
 		return true;
 	}
 
+
 	private int getID() throws IOException {
 		db.seek(0);
 		if(isEmpty()) {
@@ -157,6 +256,7 @@ public class DataBaseAccess {
 		}
 	}
 	
+
 	private boolean isEmpty() throws IOException {
 		return db.length() == 0;
 	}

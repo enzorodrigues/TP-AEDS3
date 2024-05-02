@@ -28,7 +28,7 @@ public class App {
 			musicData = line.split(";");
 			date = musicData[3]+"/"+musicData[4]+"/"+musicData[5];
 			
-			music = new Music(musicData[0], musicData[1].split(","), Byte.parseByte(musicData[2]),
+			music = new Music(musicData[0], musicData[1].split(", "), Byte.parseByte(musicData[2]),
 									new Date(date), Integer.parseInt(musicData[6]), 
 									Short.parseShort(musicData[7]), Long.parseLong(musicData[8]));
 			addRecord(music);
@@ -70,11 +70,14 @@ public class App {
 	private static void initalMenu() {
 		int option;
 		do {
-			MyIO.println("TP01 - AEDS III (Spotify Musics): MENU INICIAL");
+			MyIO.println("TP02 - AEDS III (Spotify Musics): MENU INICIAL");
 			MyIO.println("1 - Importar base de dados");
 			MyIO.println("2 - Adicionar nova musica ");
 			MyIO.println("3 - Buscar musica por ID");
-			MyIO.println("4 - Apagar musica por ID");
+			MyIO.println("4 - Buscar musica por nome");
+			MyIO.println("5 - Buscar musica por artista");
+			MyIO.println("6 - Buscar musica por nome e artista");
+			MyIO.println("7 - Apagar musica por ID");
 			MyIO.println("9 - SAIR");
 			MyIO.print("Selecao: ");
 			option = MyIO.readInt();
@@ -90,10 +93,18 @@ public class App {
 					searchMusicByIdMenu();
 					break;
 				case 4:
+					searchMusicByNameMenu();
+					break;
+				case 5:
+					searchMusicByArtistsMenu();
+					break;
+				case 6:
+					searchMusicByNameAndArtistsMenu();
+					break;
+				case 7:
 					deleteMusicByIdMenu();
 					break;
 				case 9:
-					//list();
 					break;
 				default:
 					MyIO.println("OPCAO INVALIDA");
@@ -109,7 +120,7 @@ public class App {
 		short rank;
 		long streams;
 
-		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): ADICIONAR MUSICA");
+		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): ADICIONAR MUSICA");
 		
 		name = MyIO.readLine("Nome: ");
 		artists =  MyIO.readLine("Artistas (separados por virgula): ");
@@ -127,7 +138,7 @@ public class App {
 	private static void searchMusicByIdMenu() {
 		String update;
 		int id;
-		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): BUSCAR MUSICA");
+		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
 		
 		MusicDTO dto = readRecord(id);
@@ -144,24 +155,49 @@ public class App {
 		MyIO.println("\n");
 	}
 	
+	private static void searchMusicByNameMenu() {
+		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME");
+		String name = MyIO.readLine("Nome: ");
+		
+		db.searchByMusicName(name.split(" "));
+		MyIO.println("\n");
+	}
+	
+	private static void searchMusicByArtistsMenu() {
+		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR ARTISTA");
+		String artists = MyIO.readLine("Artistas: ");
+		
+		db.searchByArtistName(artists.split(" "));
+		MyIO.println("\n");
+	}
+	
+	private static void searchMusicByNameAndArtistsMenu() {
+		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME E ARTISTA");
+		String name = MyIO.readLine("Nome: ");
+		String artists = MyIO.readLine("Artistas: ");
+		
+		db.searchByMusicNameAndArtists(name.split(" "), artists.split(" "));
+		MyIO.println("\n");
+	}
+
 	private static void updateMusicMenu(MusicDTO dto) {
 		Music music = dto.getMusic().clone();
 		String updates;
-		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): ATUALIZAR MUSICA: " + music.getID());
-		MyIO.println("Nao atualizar -> '...'");
+		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): ATUALIZAR MUSICA: " + music.getID());
+		MyIO.println("Nao atualizar -> '.'");
 		
 		updates = MyIO.readLine("Nome: ");
-		if(!updates.equals("...")) { music.setName(updates); }
+		if(!updates.equals(".")) { music.setName(updates); }
 		updates = MyIO.readLine("Artistas: ");
-		if(!updates.equals("...")) { music.setArtists(updates.split(",")); }
+		if(!updates.equals(".")) { music.setArtists(updates.split(",")); }
 		updates = MyIO.readLine("Data de lancamento(yyyy/MM/dd): ");
-		if(!updates.equals("...")) { music.setReleaseDate(new Date(updates)); }
+		if(!updates.equals(".")) { music.setReleaseDate(new Date(updates)); }
 		updates = MyIO.readLine("Playlists: ");
-		if(!updates.equals("...")) { music.setInSpotifyPlaylists(Integer.parseInt(updates)); }
+		if(!updates.equals(".")) { music.setInSpotifyPlaylists(Integer.parseInt(updates)); }
 		updates = MyIO.readLine("Ranking: ");
-		if(!updates.equals("...")) { music.setRankSpotifyCharts(Short.parseShort(updates)); }
+		if(!updates.equals(".")) { music.setRankSpotifyCharts(Short.parseShort(updates)); }
 		updates = MyIO.readLine("Streams: ");
-		if(!updates.equals("...")) { music.setSpotifyStreams(Long.parseLong(updates)); }
+		if(!updates.equals(".")) { music.setSpotifyStreams(Long.parseLong(updates)); }
 		
 		boolean success = updateRecord(music, dto);
 		MyIO.println("\n" + (success? "Musica Atualizada: " : "Falha ao atualizar musica: ") + music.toString());
@@ -169,7 +205,7 @@ public class App {
 	
 	private static void deleteMusicByIdMenu() {
 		int id;
-		MyIO.println("\n\nTP01 - AEDS III (Spotify Musics): APAGAR MUSICA");
+		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): APAGAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
 		boolean success = deleteRecord(id);
 		
