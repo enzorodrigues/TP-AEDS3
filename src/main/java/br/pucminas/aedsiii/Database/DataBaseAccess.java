@@ -5,6 +5,7 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import main.java.br.pucminas.aedsiii.MyIO;
 import main.java.br.pucminas.aedsiii.Database.DTO.MusicDTO;
 import main.java.br.pucminas.aedsiii.Entity.Music;
 import main.java.br.pucminas.aedsiii.Indexes.Index;
@@ -203,7 +204,7 @@ public class DataBaseAccess {
 		int size;
 		long recordPointer, gravestonePointer;
 		byte[] recording;
-		Music music = new Music();
+		Music music;
 		long address = indexDB.findIndex(id);
 		
 		try {
@@ -218,7 +219,7 @@ public class DataBaseAccess {
 
 			db.read(recording);
 			if(gravestone != GRAVESTONE_SIGNAL) {
-				music.fromByteArray(recording);
+				music = Music.fromByteArray(recording);
 				return new MusicDTO(music, gravestonePointer, recordPointer);
 			}
 		} catch (Exception e) { 
