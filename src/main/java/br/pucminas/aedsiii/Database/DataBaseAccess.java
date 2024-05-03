@@ -12,6 +12,14 @@ import main.java.br.pucminas.aedsiii.Indexes.Index;
 import main.java.br.pucminas.aedsiii.Indexes.BTree.BStarTree;
 import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.InvertedList;
 
+/**
+ * Classe responsavel pelo gerenciamento do
+ * arquivo de dados.
+ * 
+ * @since TP01
+ * @author Enzo Rodrigues Soares
+ * @version 2
+ */
 public class DataBaseAccess {
 	private static char GRAVESTONE_SIGNAL = '*';
 	private static String SPLIT_SIGNAL = " ";
@@ -22,6 +30,10 @@ public class DataBaseAccess {
 	private InvertedList artistIndex = new InvertedList("artists.db", (byte)50);
 	private InvertedList musicNameIndex = new InvertedList("name.db", (byte)50);
 
+	/**
+	 * Intancia a conexao com o arquivo de dados. <br>
+	 * Se nao existir: cria e define o cabeçalho.
+	 */
 	public DataBaseAccess() {
 		try {
 			String path = System.getProperty("user.dir");
@@ -34,6 +46,11 @@ public class DataBaseAccess {
 		}
 	}
 	
+	/**
+	 * Adiciona uma nova musica ao arquivo de dados.
+	 * @param music - Nova musica
+	 * @return boolean - Adicionou?
+	 */
 	public boolean createRecord(Music music) {
 		try {
 			music.setID(getID());
@@ -54,6 +71,11 @@ public class DataBaseAccess {
 		}
 	}
 	
+	/**
+	 * Realiza a indexação da musica nos arquivos de indices
+	 * @param music - Musica salva
+	 * @param address - Endereço da musica no arquivo de dados
+	 */
 	private void indexing(Music music, long address) {
 		indexDB.insertIndex(new Index(music.getID(), address));
 		
@@ -62,6 +84,11 @@ public class DataBaseAccess {
 		artistIndex.createTerms(music.artistsConcat().split(ARTISTS_SPLIT_SIGNAL), music.getID());
 	}
 	
+	/**
+	 * Busca uma musica por ID no arquivo de dados.
+	 * @param id - ID a procurar
+	 * @return MusicDTO - Musica e seus endereços
+	 */
 	public MusicDTO readRecord(int id) {
 		if(!recordCanExists(id)) { return null; }
 
@@ -69,6 +96,12 @@ public class DataBaseAccess {
 		return dto;
 	}
 	
+	/**
+	 * Deleta uma musica no arquivo de dados pelo ID.<br>
+	 * Remove também suas referencias nos arquivos de indice
+	 * @param id - ID a deletar
+	 * @return boolean - Removido? 
+	 */
 	public boolean deleteRecord(int id) {
 		MusicDTO dto = readRecord(id);
 		if(dto == null) { return false; }
@@ -86,6 +119,13 @@ public class DataBaseAccess {
 		return true;
 	}
 	
+	/**
+	 * Realiza a atualização de uma musica no arquivo de dados.<br>
+	 * Caso necessário, atualiza também suas referencias nos arquivos de indices
+	 * @param music - Musica atualizada
+	 * @param dto - Objeto com informações primárias da musica
+	 * @return boolean - Atualizado nos arquivos? 
+	 */
 	public boolean updateRecord(Music music, MusicDTO dto) {
 		try {
 			byte[] newMusic = music.toByteArray();
@@ -123,6 +163,9 @@ public class DataBaseAccess {
 		return true;
 	}
 	
+	/**
+	 * Encerra a conexão com os arquivos de dados e indices
+	 */
 	public void close() {
 		try {
 			db.close();
@@ -134,6 +177,13 @@ public class DataBaseAccess {
 		}
 	}
 	
+	/**
+	 * Busca e imprime as musica em que seu nome contenha todos 
+	 * os termos procurados e também os nomes dos 
+	 * artistas participantes obedeçam a todos termos procurados
+	 * @param nameTerms - Termos da busca para o nome da musica
+	 * @param artistTerms - Termos da busca para os nomes dos artistas
+	 */
 	public void searchByMusicNameAndArtists(String[] nameTerms, String[] artistTerms) {
 		Integer[] nameIDs = musicNameIndex.searchTerm(nameTerms);
 		Integer[] artistIDs = artistIndex.searchTerm(artistTerms);
@@ -150,6 +200,11 @@ public class DataBaseAccess {
 		}
 	}
 	
+	/**
+	 * Busca e imprime as musica em que seu nome contenha todos 
+	 * os termos procurados
+	 * @param terms - Termos da busca
+	 */
 	public void searchByMusicName(String[] terms) {
 		MusicDTO dto;
 		Integer[] ids = musicNameIndex.searchTerm(terms);
@@ -161,6 +216,11 @@ public class DataBaseAccess {
 		}
 	}
 	
+	/**
+	 * Busca e imprime as musica em que os nomes dos 
+	 * artistas participantes obedeçam a todos termos procurados
+	 * @param terms - Termos da busca
+	 */
 	public void searchByArtistName(String[] terms) {
 		MusicDTO dto;
 		Integer[] ids = artistIndex.searchTerm(terms);
@@ -172,6 +232,15 @@ public class DataBaseAccess {
 		}
 	}
 	
+	/**
+	 * Atualiza no arquivo de lista invertida os termos existentes na musica. <br>
+	 * Define quais termos sao novos e quais nao aparecem mais. Adiciona o ID aos termos novos
+	 * e exclui o ID dos termos nao utilizados.
+	 * @param index - Lista invertida a ser atualizada
+	 * @param oldTerms - Termos da musica antes da atualização
+	 * @param newTerms - Termos da musica apos atualização
+	 * @param id - ID atualizado
+	 */
 	private void updateIndexes(InvertedList index, String[] oldTerms, String[] newTerms, int id) {
 		HashSet<String> oldUniques = new HashSet<String>(Arrays.asList(oldTerms));
 		HashSet<String> newUniques = new HashSet<String>(Arrays.asList(newTerms));
@@ -197,9 +266,12 @@ public class DataBaseAccess {
 		
 		index.updateTerms(oldTerms, newTerms, id);
 	}
-		
-	// MARK: - Private Functions
 	
+	/**
+	 * Busca a partir do arquivo de indices uma musica pelo ID
+	 * @param id - ID procurado
+	 * @return MusicDTO - Musica procurada e endereços uteis.
+	 */
 	private MusicDTO search(int id) {
 		int size;
 		long recordPointer, gravestonePointer;
@@ -229,6 +301,12 @@ public class DataBaseAccess {
 		return null;
 	}
 
+	/**
+	 * Valida a existencia de um ID no arquivo de dados,
+	 * evitando o acesso desnecessário aos arquivos.
+	 * @param id - ID procurado
+	 * @return boolean - Pode existir?
+	 */
 	private boolean recordCanExists(int id) {
 		try {
 			db.seek(0);
@@ -245,6 +323,12 @@ public class DataBaseAccess {
 		return true;
 	}
 
+	/**
+	 * Retorna o proximo ID a ser utilizado. <br>
+	 * Le o ultimo ID utilizado, define o proximo e atualiza no cabeçalho do arquivo.
+	 * @return int - Novo ID
+	 * @throws IOException
+	 */
 	private int getID() throws IOException {
 		db.seek(0);
 		int id = db.readInt()+1;
