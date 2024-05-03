@@ -20,8 +20,8 @@ public class IndexDTO {
 	 * Objeto que transita informações uteis para manipulacao de
 	 * indices no arquivo de indices. 
 	 * @param i - Indice a ser transferido
-	 * @param left - Endereço para a pagina a esquerda
-	 * @param right- Endereço para a pagina a direita
+	 * @param left - Endereço  da pagina a esquerda
+	 * @param right - Endereço da pagina a direita
 	 */
 	public IndexDTO(Index i, long left, long right) {
 		this.index = i;

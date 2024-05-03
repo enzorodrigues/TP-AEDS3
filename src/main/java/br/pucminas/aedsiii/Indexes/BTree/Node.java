@@ -6,6 +6,14 @@ import java.io.DataOutputStream;
 
 import main.java.br.pucminas.aedsiii.Indexes.Index;
 
+/**
+ * Classe responsavel pela estrutura e operacoes 
+ * de uma pagina do arquivo de indices.
+ * 
+ * @since TP02
+ * @author Enzo Rodrigues Soares
+ * @version 1
+ */
 public class Node {
 	protected static short NODE_SIZE = 197;
 	protected long fatherAddress;
@@ -14,6 +22,9 @@ public class Node {
 	Index[] indexes;
 	long[] children;
 	
+	/**
+	 * Instancia de uma pagina vazia
+	 */
 	public Node() {
 		this.fatherAddress = -1;
 		this.size = 0;
@@ -28,7 +39,86 @@ public class Node {
 		children[BStarTree.ORDER-1] = -1;
 	}
 	
+	/**
+	 * Adiciona as informações de um novo indice para 
+	 * ultima posição do array de indices da pagina
+	 * @param i - Indice a ser adicionado na pagina
+	 */
+	public void addIndex(Index i) {
+		this.indexes[size].copy(i);
+		size++;
+	}
+	
+	/**
+	 * Adiciona um novo ponteiro para uma pagina
+	 * no final do array de filhos
+	 * @param rightChild - Endereço da pagina filha
+	 */
+	public void addChild(long rightChild) {
+		this.children[size] = rightChild;
+	}
+	
+	/**
+	 * Retorna o endereco do primeiro filho da pagina
+	 * @return long - endereço da pagina
+	 */
+	private long getFirstChild() {
+		return children[0];
+	}
+	
+	/**
+	 * Retorna o endereco do ultimo filho da pagina
+	 * @return long - endereço da pagina
+	 */
+	public long getLastChild() {
+		return children[size];
+	}
+	
+	/**
+	 * Retorna o endereco do penultimo filho da pagina
+	 * @return long - endereço da pagina
+	 */
+	public long getPenultimateChild() {
+		return children[size-1];
+	}
+	
+	/**
+	 * Retorna o ultimo do indice da pagina
+	 * @return Index - id e endereço
+	 */
+	public Index getLastIndex() {
+		return indexes[size-1];
+	}
+	
+	/**
+	 * Alterar o valor do ultimo indice
+	 * @param i - Novo indice
+	 */
+	private void setLastIndex(Index i) {
+		 indexes[size-1].copy(i);
+	}
+	
+	/**
+	 * Reposiciona todo o conteudo dos arrays de indices e
+	 * filhos uma posicao para tras. Reinicia as posicoes 
+	 * nao utilizadas
+	 */
+	private void moveBackward() {
+		for(byte i=0; i<size-1; i++) {
+			indexes[i].copy(indexes[i+1]);
+			children[i] = children[i+1];
+		}
+		children[size-1] = children[size];
 
+		indexes[size-1].reset();
+		children[size] = -1;
+		size--;
+	}
+
+	/**
+	 * Codifica em byte array o conteudo de uma pagina
+	 * @return byte[] - Pagina codificada
+	 */
 	public byte[] toByteArray() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
@@ -47,8 +137,12 @@ public class Node {
         
         return baos.toByteArray();
     }
-	
-	
+
+	/**
+	 * Decodifica de um byte array o conteudo de uma pagina
+	 * @param b - byte array a decodificar
+	 * @return Node - pagina decodificada
+	 */
 	public static Node fromByteArray(byte[] b) {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
         DataInputStream dis = new DataInputStream(bais);
@@ -70,48 +164,15 @@ public class Node {
 	    	return null;
 	    }
 	}
-	
-	public void addIndex(Index i) {
-		this.indexes[size].copy(i);
-		size++;
-	}
-	
-	public void addChild(long rightChild) {
-		this.children[size] = rightChild;
-	}
-	
-	private long getFirstChild() {
-		return children[0];
-	}
-	
-	public long getLastChild() {
-		return children[size];
-	}
-	
-	public long getPenultimateChild() {
-		return children[size-1];
-	}
-	
-	public Index getLastIndex() {
-		return indexes[size-1];
-	}
-	
-	private void setLastIndex(Index i) {
-		 indexes[size-1].copy(i);
-	}
-	
-	private void moveBackward() {
-		for(byte i=0; i<size-1; i++) {
-			indexes[i].copy(indexes[i+1]);
-			children[i] = children[i+1];
-		}
-		children[size-1] = children[size];
 
-		indexes[size-1].reset();
-		children[size] = -1;
-		size--;
-	}
-	
+	/**
+	 * Realiza a divisao (em dois) de uma pagina cheia. <br>
+	 * Origem: Mantem os menores IDs; <br>
+	 * Destino: Recebe os maiores IDs da origem;
+	 * @param origin - Pagina cheia a ser dividida
+	 * @param destiny - Pagina a receber metade do conteudo da origem
+	 * @return Index - indice promovido
+	 */
 	public static Index splitNodes(Node origin, Node destiny) {
 		destiny.fatherAddress = origin.fatherAddress;
 		int half = (BStarTree.ORDER-1)/2;
@@ -136,6 +197,14 @@ public class Node {
 		return promoted;
 	}
 	
+	/**
+	 * Valida/realiza a possibilidade de doar indices e filhos para uma pagina irma,
+	 * evitando a necessidade criar uma nova pagina.
+	 * @param father - Pagina que aponta para paginas envolvidas na doação
+	 * @param sister - Pagina irma a receber a doação de indices
+	 * @param page - Pagina cheia, doadora de indices
+	 * @return boolean - True: Conteudo doado / False: Pagina irmã cheia
+	 */
 	public static boolean sendToSister(Node father, Node sister, Node page) {
 		if(sister.size == BStarTree.ORDER-1) {
 			return false;
