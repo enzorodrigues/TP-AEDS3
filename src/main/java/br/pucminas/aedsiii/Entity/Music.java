@@ -15,7 +15,7 @@ import java.util.Date;
  * 
  * @since TP01
  * @author Enzo Rodrigues Soares
- * @version 1
+ * @version 2
  */
 public class Music {
 	private int id = -1;

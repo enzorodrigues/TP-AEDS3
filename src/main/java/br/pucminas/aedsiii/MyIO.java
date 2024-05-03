@@ -7,8 +7,12 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
-class MyIO {
-
+/**
+ * Classe resposável pelas operações de I/O da aplicação.
+ * 
+ * @since TP01
+ */
+public class MyIO {
    private static BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("ISO-8859-1")));
    private static String charset = "ISO-8859-1";
 

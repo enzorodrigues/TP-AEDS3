@@ -3,6 +3,7 @@ package main.java.br.pucminas.aedsiii.Indexes.InvertedLists;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.HashSet;
+
 import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.DTO.LineDTO;
 
 /**

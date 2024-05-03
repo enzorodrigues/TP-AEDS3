@@ -7,10 +7,22 @@ import main.java.br.pucminas.aedsiii.Database.DTO.MusicDTO;
 import main.java.br.pucminas.aedsiii.Entity.Music;
 import main.java.br.pucminas.aedsiii.FileUtil.TextFileReader;
 
+/**
+ * Classe raiz da aplicacao. Inicia todas as conexoes e realiza
+ * a interacao com o usuario.
+ * 
+ * @since TP01
+ * @author Enzo Rodrigues Soares
+ * @version 2
+ */
 public class App {
 	private static String csvFilePath = "\\src\\main\\resources\\popularSpotifySongs.csv";
 	private static DataBaseAccess db;
 	
+	/**
+	 * Realiza a leitura da base de dados e insere as musicas
+	 * no arquivo de dados.
+	 */
 	@SuppressWarnings("deprecation")
 	private static void uploadData() {
 		String path = System.getProperty("user.dir");
@@ -31,7 +43,7 @@ public class App {
 			music = new Music(musicData[0], musicData[1].split(", "), Byte.parseByte(musicData[2]),
 									new Date(date), Integer.parseInt(musicData[6]), 
 									Short.parseShort(musicData[7]), Long.parseLong(musicData[8]));
-			addRecord(music);
+			db.createRecord(music);
 			total++;
 			line = base.readLine();
 		}
@@ -39,9 +51,12 @@ public class App {
 		MyIO.println("Sucesso na importacao do .csv para base de dados! Total: "+total+" registros.\n");
 	}
 	
+	/**
+	 * Função teste para listagem das musicas salvas no arquivo de dados.
+	 */
 	private static void list() {
 		for(int i=0; i<951; i++) {
-			MusicDTO dto = readRecord(i);
+			MusicDTO dto = db.readRecord(i);
 			if(dto != null) {
 				MyIO.println("ID encontrado: " + i);
 				MyIO.println(dto.getMusic().toString());
@@ -50,23 +65,10 @@ public class App {
 			}
 		}
 	}
-	
-	private static boolean addRecord(Music music) {
-		return db.createRecord(music);
-	}
-	
-	private static MusicDTO readRecord(int id){
-		return db.readRecord(id);
-	}
-	
-	private static boolean updateRecord(Music music, MusicDTO dto) {
-		return db.updateRecord(music, dto);
-	}
-	
-	private static boolean deleteRecord(int id) {
-		return db.deleteRecord(id);
-	}
 
+	/**
+	 * Exibição do menu inicial e direcionamento para aos demais menus.
+	 */
 	private static void initalMenu() {
 		int option;
 		do {
@@ -114,6 +116,9 @@ public class App {
 		MyIO.println("Ate logo...");
 	}
 	
+	/**
+	 * Menu para adicionar uma nova musica a base de dados.
+	 */
 	private static void createMusicMenu() {
 		String name, artists, date;
 		int playlists;
@@ -130,18 +135,22 @@ public class App {
 		streams = MyIO.readLong("Numero de streams: ");
 		
 		Music music = new Music(name, artists, date, playlists, rank, streams);
-		boolean success = addRecord(music);
+		boolean success = db.createRecord(music);
 		MyIO.println("\n"+music.toString());
 		MyIO.println((success? "Musica adicionada a base de dados." : "Parece que houve um erro. Tente novamente.")+"\n\n");
 	}
 	
+	/**
+	 * Menu para buscar musicas, por <strong>ID</strong>, na base de dados.
+	 * <br> Caso o ID exista, é possivel atualiza-lo.
+	 */
 	private static void searchMusicByIdMenu() {
 		String update;
 		int id;
 		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
 		
-		MusicDTO dto = readRecord(id);
+		MusicDTO dto = db.readRecord(id);
 		if(dto != null) {
 			MyIO.println("ID encontrado:" + id);
 			MyIO.println(dto.getMusic().toString());
@@ -155,6 +164,9 @@ public class App {
 		MyIO.println("\n");
 	}
 	
+	/**
+	 * Menu para buscar musicas, por <strong>nome</strong>, na base de dados.
+	 */
 	private static void searchMusicByNameMenu() {
 		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME");
 		String name = MyIO.readLine("Nome: ");
@@ -163,6 +175,9 @@ public class App {
 		MyIO.println("\n");
 	}
 	
+	/**
+	 * Menu para buscar musicas, por <strong>artistas</strong>, na base de dados.
+	 */
 	private static void searchMusicByArtistsMenu() {
 		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR ARTISTA");
 		String artists = MyIO.readLine("Artistas: ");
@@ -171,6 +186,10 @@ public class App {
 		MyIO.println("\n");
 	}
 	
+	/**
+	 * Menu para buscar musicas, por <strong>nome</strong> e 
+	 * <strong>artistas</strong>, na base de dados.
+	 */
 	private static void searchMusicByNameAndArtistsMenu() {
 		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME E ARTISTA");
 		String name = MyIO.readLine("Nome: ");
@@ -180,6 +199,10 @@ public class App {
 		MyIO.println("\n");
 	}
 
+	/**
+	 * Menu para atualizar as informações de uma musica na base de dados
+	 * @param dto - Musica e seus endereço na base de dados
+	 */
 	private static void updateMusicMenu(MusicDTO dto) {
 		Music music = dto.getMusic().clone();
 		String updates;
@@ -199,20 +222,28 @@ public class App {
 		updates = MyIO.readLine("Streams: ");
 		if(!updates.equals(".")) { music.setSpotifyStreams(Long.parseLong(updates)); }
 		
-		boolean success = updateRecord(music, dto);
+		boolean success = db.updateRecord(music, dto);
 		MyIO.println("\n" + (success? "Musica Atualizada: " : "Falha ao atualizar musica: ") + music.toString());
 	}
 	
+	/**
+	 * Menu para apagar uma musica da base de dados.
+	 */
 	private static void deleteMusicByIdMenu() {
 		int id;
 		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): APAGAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
-		boolean success = deleteRecord(id);
+		boolean success = db.deleteRecord(id);
 		
 		MyIO.println((success ? "Sucesso ao apagar musica: " : "Falha ao apagar musica: ")+id+ "\n\n");
 	}
 	
-	public static void main(String[] args) throws Exception {
+	/**
+	 * Função inicial da aplicação, configura charset instancia conexao com
+	 * a base de dados e inicia a interação com usuário.
+	 * @param args
+	 */
+	public static void main(String[] args) {
 		MyIO.setCharset("UTF-8");
 		db = new DataBaseAccess();
 		initalMenu();
