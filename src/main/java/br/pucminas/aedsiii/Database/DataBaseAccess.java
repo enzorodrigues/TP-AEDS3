@@ -17,7 +17,6 @@ import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.InvertedList;
  * arquivo de dados.
  * 
  * @since TP01
- * @author Enzo Rodrigues Soares
  * @version 2
  */
 public class DataBaseAccess {

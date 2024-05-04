@@ -8,7 +8,6 @@ import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.InvertedListLine;
  * invertida
  * 
  * @since TP02
- * @author Enzo Rodrigues Soares
  * @version 1
  */
 public class LineDTO {

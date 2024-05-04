@@ -11,7 +11,6 @@ import main.java.br.pucminas.aedsiii.Indexes.Index;
  * de uma pagina do arquivo de indices.
  * 
  * @since TP02
- * @author Enzo Rodrigues Soares
  * @version 1
  */
 public class Node {

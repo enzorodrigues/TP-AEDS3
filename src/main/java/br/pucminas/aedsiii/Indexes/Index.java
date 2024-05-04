@@ -10,7 +10,6 @@ import java.io.DataOutputStream;
  * indexação de registros
  * 
  * @since TP02
- * @author Enzo Rodrigues Soares
  * @version 1
  */
 public class Index {

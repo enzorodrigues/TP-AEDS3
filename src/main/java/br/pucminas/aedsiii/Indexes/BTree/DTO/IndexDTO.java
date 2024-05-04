@@ -5,10 +5,9 @@ import main.java.br.pucminas.aedsiii.Indexes.Index;
 /**
  * Classe de auxilio na transferencia de informaçoes 
  * nas operacoes CRUD no arquivo de indexacao 
- * estruturado em uma arvore B*
+ * estruturado em uma arvore B
  * 
  * @since TP02
- * @author Enzo Rodrigues Soares
  * @version 1
  */
 public class IndexDTO {

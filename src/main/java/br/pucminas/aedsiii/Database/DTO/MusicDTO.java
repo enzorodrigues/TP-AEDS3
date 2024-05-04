@@ -7,7 +7,6 @@ import main.java.br.pucminas.aedsiii.Entity.Music;
  * nas operacoes CRUD no arquivo binario de dados
  * 
  * @since TP01
- * @author Enzo Rodrigues Soares
  * @version 1
  */
 public class MusicDTO {

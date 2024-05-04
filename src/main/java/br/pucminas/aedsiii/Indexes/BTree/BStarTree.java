@@ -12,7 +12,6 @@ import main.java.br.pucminas.aedsiii.Indexes.BTree.DTO.IndexDTO;
  * entre as paginas.
  * 
  * @since TP02
- * @author Enzo Rodrigues Soares
  * @version 1
  */
 public class BStarTree {

@@ -12,7 +12,6 @@ import main.java.br.pucminas.aedsiii.FileUtil.TextFileReader;
  * a interacao com o usuario.
  * 
  * @since TP01
- * @author Enzo Rodrigues Soares
  * @version 2
  */
 public class App {

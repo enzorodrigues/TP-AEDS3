@@ -14,7 +14,6 @@ import java.util.Date;
  * arquivo de dado.
  * 
  * @since TP01
- * @author Enzo Rodrigues Soares
  * @version 2
  */
 public class Music {

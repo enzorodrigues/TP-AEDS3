@@ -12,7 +12,6 @@ import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.DTO.LineDTO;
  * aplicacao e o arquivo.
  * 
  * @since TP02
- * @author Enzo Rodrigues Soares
  * @version 1
  */
 public class InvertedList {

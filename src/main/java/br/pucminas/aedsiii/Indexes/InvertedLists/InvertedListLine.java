@@ -9,8 +9,7 @@ import java.io.DataOutputStream;
  * Classe que traduz o conteudo de cada linha em um arquivo de lista invertida.
  * Auxilia nas operacoes CRUD de cada termo presente na indexacao.
  * 
- * @since TP02 
- * @author Enzo Rodrigues Soares
+ * @since TP02
  * @version 1
  */
 public class InvertedListLine {
