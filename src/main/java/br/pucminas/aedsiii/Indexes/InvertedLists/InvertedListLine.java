@@ -13,6 +13,7 @@ import java.io.DataOutputStream;
  * @version 1
  */
 public class InvertedListLine {
+	private String file;
 	private String term;
 	private int[] IDs;
 	private byte size;
@@ -22,7 +23,8 @@ public class InvertedListLine {
 	 * @param term - Termo a ser indexado
 	 * @param references - Quantidade limite de ids referenciados pelo termo
 	 */
-	public InvertedListLine(String term, byte references) {
+	public InvertedListLine(String term, byte references, String file) {
+		this.file = file;
 		this.term = term;
 		this.IDs = new int[references];
 		for(byte i=0; i<references; i++) {
@@ -35,8 +37,8 @@ public class InvertedListLine {
 	 * Cria uma instancia de uma linha de termo vazio
 	 * @param references - Quantidade limite de ids referenciados pelo termo
 	 */
-	public InvertedListLine(byte references) {
-		this("", references);
+	public InvertedListLine(byte references, String file) {
+		this("", references, file);
 	}
 	
 	/**
@@ -48,7 +50,7 @@ public class InvertedListLine {
 			this.IDs[size] = id;
 			size++;
 		} catch (Exception e) {
-			System.err.println("Erro on add id "+ id+ " on index term "+term);
+			System.err.println("Erro on add id "+ id+ " on term '"+term+"' - from file: "+file);
 		}
 		
 	}
@@ -124,11 +126,11 @@ public class InvertedListLine {
 	 * @param references - Quantidade maxima de referencias da linha
 	 * @return InvertedListLine - Linha decodificada (termo e suas referencias)
 	 */
-	public static InvertedListLine fromByteArray(byte[] b, byte references) {
+	public static InvertedListLine fromByteArray(byte[] b, byte references, String file) {
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
         DataInputStream dis = new DataInputStream(bais);
         
-        InvertedListLine line = new InvertedListLine(references);
+        InvertedListLine line = new InvertedListLine(references, file);
         try {
         	line.term = dis.readUTF();
         	line.size = dis.readByte();

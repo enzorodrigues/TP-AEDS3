@@ -25,7 +25,7 @@ public class BStarTree {
 	public BStarTree() {
 		try {
 			String path = System.getProperty("user.dir");
-			db = new RandomAccessFile(path+"\\src\\main\\resources\\indexes\\index.db", "rwd");
+			db = new RandomAccessFile(path+"\\src\\main\\resources\\indexes\\index.db", "rw");
 			if(db.length() == 0) {
 				db.seek(0);
 				db.writeLong(8);
@@ -243,9 +243,7 @@ public class BStarTree {
 	}
 
 	// MARK: - DELETE
-	public void deleteIndex() {
-		
-	}
+	public void deleteIndex(int id) { }
 	
 	// MARK - Utils
 	

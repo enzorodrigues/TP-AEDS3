@@ -27,7 +27,7 @@ public class DataBaseAccess {
 	private RandomAccessFile db;
 	private BStarTree indexDB = new BStarTree();
 	private InvertedList artistIndex = new InvertedList("artists.db", (byte)50);
-	private InvertedList musicNameIndex = new InvertedList("name.db", (byte)50);
+	private InvertedList musicNameIndex = new InvertedList("name.db", (byte)70);
 
 	/**
 	 * Intancia a conexao com o arquivo de dados. <br>
@@ -61,7 +61,7 @@ public class DataBaseAccess {
 			db.writeInt(musicByteArray.length);
 			db.write(musicByteArray);
 
-			indexing(music, address);
+			createIndexes(music, address);
 
 			return true;
 		} catch (Exception e) {
@@ -75,7 +75,7 @@ public class DataBaseAccess {
 	 * @param music - Musica salva
 	 * @param address - Endereço da musica no arquivo de dados
 	 */
-	private void indexing(Music music, long address) {
+	private void createIndexes(Music music, long address) {
 		indexDB.insertIndex(new Index(music.getID(), address));
 		
 		musicNameIndex.createTerms(music.getName().split(SPLIT_SIGNAL), music.getID());
@@ -108,14 +108,24 @@ public class DataBaseAccess {
 		try {
 			db.seek(dto.getGravestonePointer());
 			db.writeChar(GRAVESTONE_SIGNAL);
-			artistIndex.deleteIdFromTerms(dto.getMusic().artistsConcat().split(SPLIT_SIGNAL), id);
-			musicNameIndex.deleteIdFromTerms(dto.getMusic().getName().split(ARTISTS_SPLIT_SIGNAL), id);
+			deleteIndexes(dto, id);
 		} catch(IOException e) {
 			System.err.println("Error on delete record: "+id);
 			return false;
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Remove as referencias ao ID nos arquvios de indices
+	 * @param dto - Objeto com musica e endereços uteis
+	 * @param id - ID da musica removida
+	 */
+	private void deleteIndexes(MusicDTO dto, int id) {
+		indexDB.deleteIndex(id);
+		artistIndex.deleteIdFromTerms(dto.getMusic().artistsConcat().split(ARTISTS_SPLIT_SIGNAL), id);
+		musicNameIndex.deleteIdFromTerms(dto.getMusic().getName().split(SPLIT_SIGNAL), id);
 	}
 	
 	/**
@@ -126,33 +136,23 @@ public class DataBaseAccess {
 	 * @return boolean - Atualizado nos arquivos? 
 	 */
 	public boolean updateRecord(Music music, MusicDTO dto) {
+		long newAddress = -5;
 		try {
 			byte[] newMusic = music.toByteArray();
 			byte[] oldMusic = dto.getMusic().toByteArray();
 			
 			if(newMusic.length <= oldMusic.length) {
 				db.seek(dto.getRecordPointer());
-				db.write(newMusic);
 			} else {
 				db.seek(dto.getGravestonePointer());
 				db.writeChar(GRAVESTONE_SIGNAL);
-				long newAddress = db.length();
+				newAddress = db.length();
 				db.seek(newAddress);
 				db.writeChar(' ');
 				db.writeInt(newMusic.length);
-				db.write(newMusic);
-				indexDB.updateIndex(music.getID(), newAddress);
 			}
-			
-			if(!music.getName().equalsIgnoreCase(dto.getMusic().getName())) {
-				updateIndexes(musicNameIndex, dto.getMusic().getName().split(SPLIT_SIGNAL), 
-							  music.getName().split(SPLIT_SIGNAL), music.getID());
-			}
-			
-			if(!music.artistsConcat().equalsIgnoreCase(dto.getMusic().artistsConcat())) {
-				updateIndexes(artistIndex, dto.getMusic().artistsConcat().split(ARTISTS_SPLIT_SIGNAL), 
-						  	  music.artistsConcat().split(ARTISTS_SPLIT_SIGNAL), music.getID());
-			}
+			db.write(newMusic);
+			updateIndexes(music, dto, newAddress);
 			
 		} catch(IOException e) {
 			System.err.println("Error on update record: "+music);
@@ -160,6 +160,29 @@ public class DataBaseAccess {
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Atualiza os arquivos de indices baseados nas alterações
+	 * no antigo registro.
+	 * @param music - Musica atualizada
+	 * @param dto - Antiga musica e seus endereços
+	 * @param newAddress - Novo endereço
+	 */
+	private void updateIndexes(Music music, MusicDTO dto, long newAddress) {
+		if(newAddress != -5) {
+			indexDB.updateIndex(music.getID(), newAddress);
+		}
+		
+		if(!music.getName().equalsIgnoreCase(dto.getMusic().getName())) {
+			updateInvertedList(musicNameIndex, dto.getMusic().getName().split(SPLIT_SIGNAL), 
+						  music.getName().split(SPLIT_SIGNAL), music.getID());
+		}
+		
+		if(!music.artistsConcat().equalsIgnoreCase(dto.getMusic().artistsConcat())) {
+			updateInvertedList(artistIndex, dto.getMusic().artistsConcat().split(ARTISTS_SPLIT_SIGNAL), 
+					  	  music.artistsConcat().split(ARTISTS_SPLIT_SIGNAL), music.getID());
+		}
 	}
 	
 	/**
@@ -240,7 +263,7 @@ public class DataBaseAccess {
 	 * @param newTerms - Termos da musica apos atualização
 	 * @param id - ID atualizado
 	 */
-	private void updateIndexes(InvertedList index, String[] oldTerms, String[] newTerms, int id) {
+	private void updateInvertedList(InvertedList index, String[] oldTerms, String[] newTerms, int id) {
 		HashSet<String> oldUniques = new HashSet<String>(Arrays.asList(oldTerms));
 		HashSet<String> newUniques = new HashSet<String>(Arrays.asList(newTerms));
 		HashSet<String> equals = new HashSet<String>();

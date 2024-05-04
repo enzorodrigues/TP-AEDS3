@@ -17,6 +17,7 @@ import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.DTO.LineDTO;
 public class InvertedList {
 	private RandomAccessFile db;
 	private byte lineReferenceSize;
+	private String fileName;
 	
 	/**
 	 * Cria uma instancia de um arquivo de lista invertida para indexacao
@@ -25,9 +26,10 @@ public class InvertedList {
 	 */
 	public InvertedList(String fileName, byte lineReferencesQuantity) {
 		try {
+			this.fileName = fileName;
 			this.lineReferenceSize = lineReferencesQuantity;
 			String path = System.getProperty("user.dir")+"\\src\\main\\resources\\indexes\\invertedLists\\";
-			db = new RandomAccessFile(path+fileName, "rwd");
+			db = new RandomAccessFile(path+fileName, "rw");
 		} catch(Exception e) {
 			System.err.println("Error on open invertedList: "+fileName);
 		}
@@ -59,7 +61,7 @@ public class InvertedList {
 	 * @param id - Primeiro ID referenciado pelo termo
 	 */
 	private void createNewTerm(String word, int id) {
-		InvertedListLine newLine = new InvertedListLine(word, lineReferenceSize);
+		InvertedListLine newLine = new InvertedListLine(word, lineReferenceSize, fileName);
 		newLine.addID(id);
 		saveLine(newLine, getLastAddress());
 	}
@@ -146,7 +148,7 @@ public class InvertedList {
 				size = db.readShort();
 				lineByteArray = new byte[size];
 				db.read(lineByteArray);
-				line = InvertedListLine.fromByteArray(lineByteArray, lineReferenceSize);
+				line = InvertedListLine.fromByteArray(lineByteArray, lineReferenceSize, fileName);
 				if(line.equals(term)) {
 					return new LineDTO(line, address);
 				}
@@ -174,7 +176,7 @@ public class InvertedList {
 				size = db.readShort();
 				lineByteArray = new byte[size];
 				db.read(lineByteArray);
-				line = InvertedListLine.fromByteArray(lineByteArray, lineReferenceSize);
+				line = InvertedListLine.fromByteArray(lineByteArray, lineReferenceSize, fileName);
 				if(line.contains(term)) {
 					set.addAll(Arrays.asList(line.getIDs()));
 				}
