@@ -6,10 +6,15 @@ Este projeto é referente ao desenvolvimento do trabalho prático aplicado na ma
 
 Aplicar na prática os conceitos ensinados durante as aulas teoricas, desenvolvendo uma aplicação que encapsule toda a matéria aplicada durante o semestre referente a MANIPULAÇÃO DE ARQUIVOS BINÁRIOS.
 
-Este projeto é separado em partes/entregas, e cada uma é uma evolução da entrega anterior. Aplicando funcionalidades e técninas a medida que avançamos com o conteúdo da matéria.
+Este projeto é separado em partes/entregas, e cada uma é evolução da entrega anterior. Aplicando funcionalidades e técninas a medida que avançamos com o conteúdo da matéria.
 
 ### Entrega 01
 
-- Definição da base de dados: https://www.kaggle.com/datasets/arnavvvvv/spotify-music
-- Implementação do CRUD;
-- Algoritmos de Ordenação Externa (Opcional).
+- Definição da base de dados: https://www.kaggle.com/datasets/arnavvvvv/spotify-music; ✅
+- Implementação do CRUD; ✅
+- Algoritmos de Ordenação Externa (Opcional). ❌
+
+### Entrega 02
+- Implementação de um arquivo de índices utilizando Árvore B*; ✅
+- Implementação de dois arquivos de Lista Invertida (Nome e Artistas); ✅
+- Implementação de um arquivo de índices utilizando Hash Estendido (Opcional). ❌

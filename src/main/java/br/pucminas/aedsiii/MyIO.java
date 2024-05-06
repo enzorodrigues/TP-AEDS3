@@ -1,19 +1,24 @@
 package main.java.br.pucminas.aedsiii;
 
-import java.io.*;
-import java.nio.charset.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
-class MyIO {
-
+/**
+ * Classe resposável pelas operações de I/O da aplicação.
+ * 
+ * @since TP01
+ */
+public class MyIO {
    private static BufferedReader in = new BufferedReader(new InputStreamReader(System.in, Charset.forName("ISO-8859-1")));
    private static String charset = "ISO-8859-1";
 
    public static void setCharset(String charset_){
       charset = charset_;
       in = new BufferedReader(new InputStreamReader(System.in, Charset.forName(charset)));
-   }
-
-   public static void print(){
    }
 
    public static void print(int x){
@@ -52,6 +57,7 @@ class MyIO {
    }
 
    public static void println(){
+	   println("");
    }
 
    public static void println(int x){
