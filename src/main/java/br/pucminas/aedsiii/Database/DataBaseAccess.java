@@ -326,6 +326,10 @@ public class DataBaseAccess {
 		return null;
 	}
 	
+	/**
+	 * Realiza o backup da base de dados. Extrai todo conteudo da base de dados para
+	 * uma string e realiza a compactacao. Tambem realiza o backup dos indices. 
+	 */
 	public void createBackup() {
 		String extract=  extractDatabaseToString();
 		
@@ -342,10 +346,16 @@ public class DataBaseAccess {
 		}
 	}
 	
+	/**
+	 * Realiza a descompactacao de um backup, substituindo a base de dados,
+	 * e seus indices.
+	 * @param version - versão do backup
+	 */
 	public void decompressBackup(int version) {
 		close();
 		boolean success = LZW.extract(version);
-		MyIO.println(success ? "Backup "+version+" restaurado" : "Versao nao encontrada "+version);
+		MyIO.println(success ? "Backup "+version+" restaurado" : "Versao nao encontrada: "+version);
+		MyIO.println();
 	}
 	
 	/**

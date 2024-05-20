@@ -10,11 +10,25 @@ import java.util.List;
 
 import main.java.br.pucminas.aedsiii.App;
 
+/**
+ * Classe compressao da base de dados utilizando o algoritmo LZW.
+ * 
+ * @since TP03
+ * @version 1
+ */
 public class LZW {
 	private static Dictionary initialDictionary;
 
 	private LZW() { }
 	
+	/**
+	 * Funcao que realiza a compressao da base de dados. Recebe a base de dados em formato de string,
+	 * realiza o pre-processamento para obter o dicionario inicial, monta o dicionario e gera a compressao.
+	 * Caso o dicionario ultrapasse o tamanho de 1 byte, é feito o congelamento.
+	 * @param input - base de dados no formato de string
+	 * @param size - tamanho da base em bytes, para comparativo
+	 * @return Int - versao gerada
+	 */
 	public static int compress(String input, long size) {
 		Dictionary dictonary = preProcess(input);
 		
@@ -38,10 +52,16 @@ public class LZW {
 		if(!prefix.isEmpty()) {
 			encoded.add(dictonary.get(prefix));
 		}
-		
-		return createCompressedFile(encoded, size);
+		int version = createCompressedFile(encoded, size);
+		return version;
 	}
 
+	/**
+	 * Realiza a descompactacao do backup selecionado. Obtem o dicionario inicial salvo invertendo os pares chave-valor,
+	 * faz a descompactacao reconstruindo o dicionario e substitui os arquivos de dados e indices atuais.
+	 * @param version - versao do backup
+	 * @return Boolean - VERDADEIRO a versao do backup existir e for possivel descompactar. FALSO caso o backup nao exista.
+	 */
 	public static boolean extract(int version) {
 		File dir = new File(App.resourcePath+"backups\\BACKUP"+version);
 		if(!dir.exists()) { return false; }
@@ -78,19 +98,19 @@ public class LZW {
 			}
 		}
 		
-		createDecompressedFile(extract);
-		
-		// restore data
-		backup(App.resourcePath+"data.db", App.resourcePath+"tmp.db", false);
-		// restore index
-		backup(App.resourcePath+"indexes\\index.db", App.resourcePath+"\\backups\\BACKUP"+version+"\\index.db", true);
-		// restore inverted lists
-		backup(App.resourcePath+"indexes\\invertedLists\\artists.db", App.resourcePath+"\\backups\\BACKUP"+version+"\\artists.db", true);
-		backup(App.resourcePath+"indexes\\invertedLists\\name.db", App.resourcePath+"\\backups\\BACKUP"+version+"\\name.db", true);
+		createDecompressedFile(extract, version);
 		
 		return true;
 	}
-		
+
+	/**
+	 * Salva os arquivos para backup. Obtem a versao do backup, criar a pasta e arquivo de dados comprimido.
+	 * Calcula a porcentagem de compressao entre o backup e o arquivo atual. Salva o dicionario inicial e realiza copias
+	 * dos arquivos de indices.
+	 * @param encoded - Array de simbolos gerados pela compactacao da base de dados
+	 * @param size - tamanho do arquivo original, em bytes, para comparacao.
+	 * @return Int - versao gerada
+	 */
 	private static int createCompressedFile(List<Integer> encoded, long size) {
 		int version = getVersion();
 		File dir = new File(App.resourcePath + "\\backups\\BACKUP"+version);
@@ -123,7 +143,14 @@ public class LZW {
 		return version;
 	}
 
-	private static void createDecompressedFile(String descompact) {
+	/**
+	 * Gera o arquivo de dados apos a descompactacao. Separa os dados obtidos pela descompactacao e
+	 * retorna para o formato do arquivo de dados. Realiza a substituicao dos arquivos atuais pelos arquivos
+	 * restaurados.
+	 * @param descompact - base de dados descompactada em formato de string
+	 * @param version - versao descompactada
+	 */
+	private static void createDecompressedFile(String descompact, int version) {
 		String[] data = descompact.split(App.DIVIDER);
 		
 		try {
@@ -151,8 +178,20 @@ public class LZW {
 		} catch (Exception e) {
 			System.err.println("Error on read backup!");
 		}
+		
+		// restore data
+		backup(App.resourcePath+"data.db", App.resourcePath+"tmp.db", false);
+		// restore index
+		backup(App.resourcePath+"indexes\\index.db", App.resourcePath+"\\backups\\BACKUP"+version+"\\index.db", true);
+		// restore inverted lists
+		backup(App.resourcePath+"indexes\\invertedLists\\artists.db", App.resourcePath+"\\backups\\BACKUP"+version+"\\artists.db", true);
+		backup(App.resourcePath+"indexes\\invertedLists\\name.db", App.resourcePath+"\\backups\\BACKUP"+version+"\\name.db", true);
 	}
 	
+	/**
+	 * Salva o dicionario inicial na pasta de backup gerada
+	 * @param path - caminho da pasta do backup gerado
+	 */
 	private static void saveInitialDict(String path) {
 		try {
 			RandomAccessFile db = new RandomAccessFile(path+ "\\dict.db", "rw");
@@ -164,9 +203,14 @@ public class LZW {
 		} catch (Exception e) {
 			System.err.println("Erron on save initial dict");
 		}
-		
 	}
 	
+	/**
+	 * Obtem o dicionario inicial para a descompactacao. Gera um dicionario
+	 * invertendo os pares chave-valor.
+	 * @param path - caminho da pasta de backup
+	 * @return HashMap<Integer, String> - Dicionario invertido
+	 */
 	private static HashMap<Integer, String> getInitialDict(String path) {
 		HashMap<Integer, String> initialDict = new HashMap<Integer, String>();
 
@@ -186,6 +230,10 @@ public class LZW {
 		return initialDict;
 	}
 	
+	/**
+	 * Obtem a proxima versao do backup a gerar baseado nas versoes existem.
+	 * @return Int - versao do backup
+	 */
 	private static int getVersion() {
 		File backupDir = new File(App.resourcePath+ "\\backups");
 		File[] dirs = backupDir.listFiles(File::isDirectory);
@@ -199,7 +247,13 @@ public class LZW {
 			}
 		return greather+1;
 	}
-	
+
+	/**
+	 * Realiza a subtituicao dos arquivo do aquivo antigo pelo novo
+	 * @param old - caminho do arquivo a substituir
+	 * @param backup - caminho do novo arquivo
+	 * @param copy - true: copiar / false: substituir
+	 */
 	private static void backup(String old, String backup, boolean copy) {
 		File data = new File(old);
 		data.delete();
@@ -207,12 +261,18 @@ public class LZW {
 		File backUp = new File(backup);
 		if(copy) {
 			try { Files.copy(backUp.toPath(), data.toPath(), StandardCopyOption.REPLACE_EXISTING); }
-			catch (Exception e) { System.err.println("ERRO NA COPIA"); }
+			catch (Exception e) { System.err.println("ERROR ON COPY BACKUP"); }
 		} else {
 			backUp.renameTo(data);
 		}
 	}
-	
+
+	/**
+	 * Pre-processamento da atual base de dados. Gera o dicionario inicial para compactacao
+	 * obtendo os simbolos unicos.
+	 * @param input - base de dados em formato de string
+	 * @return Dictionary - dicionario inicial
+	 */
 	private static Dictionary preProcess(String input) {
 		initialDictionary = new Dictionary();
 		String act;
@@ -225,18 +285,4 @@ public class LZW {
 		
 		return initialDictionary.clone();
 	}
-}
-
-class Dictionary extends HashMap<String, Integer> {
-
-	private static final long serialVersionUID = 7122442633188928431L;
-
-	public Dictionary clone() {
-		Dictionary dict = new Dictionary();
-		for(String key : this.keySet()) {
-			dict.put(key, this.get(key));
-		}
-		return dict;
-	}
-
 }
