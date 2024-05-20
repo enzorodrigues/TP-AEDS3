@@ -18,3 +18,7 @@ Este projeto é separado em partes/entregas, e cada uma é evolução da entrega
 - Implementação de um arquivo de índices utilizando Árvore B*; ✅
 - Implementação de dois arquivos de Lista Invertida (Nome e Artistas); ✅
 - Implementação de um arquivo de índices utilizando Hash Estendido (Opcional). ❌
+
+### Entrega 03
+- Implementação do algoritmo de compactção LZW; ✅
+- Opções de gerar/restaurar backups; ✅
