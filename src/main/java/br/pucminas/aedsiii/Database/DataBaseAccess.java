@@ -2,10 +2,14 @@ package main.java.br.pucminas.aedsiii.Database;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import main.java.br.pucminas.aedsiii.App;
 import main.java.br.pucminas.aedsiii.MyIO;
+import main.java.br.pucminas.aedsiii.Compression.LZW;
 import main.java.br.pucminas.aedsiii.Database.DTO.MusicDTO;
 import main.java.br.pucminas.aedsiii.Entity.Music;
 import main.java.br.pucminas.aedsiii.Indexes.Index;
@@ -35,8 +39,7 @@ public class DataBaseAccess {
 	 */
 	public DataBaseAccess() {
 		try {
-			String path = System.getProperty("user.dir");
-			db = new RandomAccessFile(path+"\\src\\main\\resources\\data.db", "rw");
+			db = new RandomAccessFile(App.resourcePath+"data.db", "rw");
 			if(db.length() == 0) {
 				db.writeInt(-1);
 			}
@@ -321,6 +324,58 @@ public class DataBaseAccess {
 		}
 
 		return null;
+	}
+	
+	public void createBackup() {
+		String extract=  extractDatabaseToString();
+		
+		try {
+			Instant start = Instant.now();
+			int version;
+			version = LZW.compress(extract, db.length());
+			Instant end = Instant.now();
+			Duration timeElapsed = Duration.between(start, end);
+			MyIO.println("Sucesso ao criar backup! Versionamento: "+ version);
+			MyIO.println("Duracao: "+ timeElapsed.toMillis() +" ms\n");
+		} catch (IOException e) {
+			System.err.println("Error on create backup");
+		}
+	}
+	
+	public void decompressBackup(int version) {
+		close();
+		boolean success = LZW.extract(version);
+		MyIO.println(success ? "Backup "+version+" restaurado" : "Versao nao encontrada "+version);
+	}
+	
+	/**
+	 * Transforma toda a base de dados em uma string. <br>
+	 * Campos separados por ';'
+	 * @return String - database
+	 */
+	private String extractDatabaseToString() {
+		String extract="";
+		try {
+			int size;
+			byte[] recording;
+			Music music;
+			
+			db.seek(0);
+			extract += db.readInt();
+			while(db.getFilePointer() < db.length()) {
+				extract += App.DIVIDER + db.readChar() + App.DIVIDER;
+				size = db.readInt();
+				extract += size;
+				recording = new byte[size];
+				db.read(recording);
+				music = Music.fromByteArray(recording);
+				extract += music.toCompactString();
+			}	
+		} catch (Exception e) {
+			System.err.println("Error on extract database to string");
+			e.printStackTrace();
+		}
+		return extract;
 	}
 
 	/**

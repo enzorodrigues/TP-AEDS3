@@ -1,8 +1,8 @@
 package main.java.br.pucminas.aedsiii.Indexes.BTree;
 
-import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import main.java.br.pucminas.aedsiii.App;
 import main.java.br.pucminas.aedsiii.Indexes.Index;
 import main.java.br.pucminas.aedsiii.Indexes.BTree.DTO.IndexDTO;
 
@@ -24,8 +24,7 @@ public class BStarTree {
 	 */
 	public BStarTree() {
 		try {
-			String path = System.getProperty("user.dir");
-			db = new RandomAccessFile(path+"\\src\\main\\resources\\indexes\\index.db", "rw");
+			db = new RandomAccessFile(App.resourcePath+"indexes\\index.db", "rw");
 			if(db.length() == 0) {
 				db.seek(0);
 				db.writeLong(8);

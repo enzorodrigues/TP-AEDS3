@@ -15,7 +15,9 @@ import main.java.br.pucminas.aedsiii.FileUtil.TextFileReader;
  * @version 2
  */
 public class App {
-	private static String csvFilePath = "\\src\\main\\resources\\popularSpotifySongs.csv";
+	public static String resourcePath = System.getProperty("user.dir")+"\\src\\main\\resources\\";
+	private static String csvFilePath = resourcePath+"popularSpotifySongs.csv";
+	public static String DIVIDER = ";";
 	private static DataBaseAccess db;
 	
 	/**
@@ -24,8 +26,7 @@ public class App {
 	 */
 	@SuppressWarnings("deprecation")
 	private static void uploadData() {
-		String path = System.getProperty("user.dir");
-		TextFileReader base = new TextFileReader(path+csvFilePath);
+		TextFileReader base = new TextFileReader(csvFilePath);
 		base.readLine();
 		
 		MyIO.println("\nImportando base de dados...");
@@ -36,7 +37,7 @@ public class App {
 		
 		String line = base.readLine();
 		while(line != null) {
-			musicData = line.split(";");
+			musicData = line.split(DIVIDER);
 			date = musicData[3]+"/"+musicData[4]+"/"+musicData[5];
 			
 			music = new Music(musicData[0], musicData[1].split(", "), Byte.parseByte(musicData[2]),
@@ -71,7 +72,7 @@ public class App {
 	private static void initalMenu() {
 		int option;
 		do {
-			MyIO.println("TP02 - AEDS III (Spotify Musics): MENU INICIAL");
+			MyIO.println("TP03 - AEDS III (Spotify Musics): MENU INICIAL");
 			MyIO.println("1 - Importar base de dados");
 			MyIO.println("2 - Adicionar nova musica ");
 			MyIO.println("3 - Buscar musica por ID");
@@ -79,7 +80,9 @@ public class App {
 			MyIO.println("5 - Buscar musica por artista");
 			MyIO.println("6 - Buscar musica por nome e artista");
 			MyIO.println("7 - Apagar musica por ID");
-			MyIO.println("9 - SAIR");
+			MyIO.println("8 - Gerar backup");
+			MyIO.println("9 - Restaurar backup");
+			MyIO.println("0 - SAIR");
 			MyIO.print("Selecao: ");
 			option = MyIO.readInt();
 			
@@ -105,12 +108,19 @@ public class App {
 				case 7:
 					deleteMusicByIdMenu();
 					break;
+				case 8:
+					db.createBackup();
+					break;
 				case 9:
+					restoreBackupMenu();
+					break;
+				case 0:
+					list();
 					break;
 				default:
 					MyIO.println("OPCAO INVALIDA");
 			}
-		} while(option != 9);
+		} while(option != 0);
 		
 		MyIO.println("Ate logo...");
 	}
@@ -124,7 +134,7 @@ public class App {
 		short rank;
 		long streams;
 
-		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): ADICIONAR MUSICA");
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): ADICIONAR MUSICA");
 		
 		name = MyIO.readLine("Nome: ");
 		artists =  MyIO.readLine("Artistas (separados por virgula): ");
@@ -146,7 +156,7 @@ public class App {
 	private static void searchMusicByIdMenu() {
 		String update;
 		int id;
-		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA");
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): BUSCAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
 		
 		MusicDTO dto = db.readRecord(id);
@@ -167,7 +177,7 @@ public class App {
 	 * Menu para buscar musicas, por <strong>nome</strong>, na base de dados.
 	 */
 	private static void searchMusicByNameMenu() {
-		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME");
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME");
 		String name = MyIO.readLine("Nome: ");
 		
 		db.searchByMusicName(name.split(" "));
@@ -178,7 +188,7 @@ public class App {
 	 * Menu para buscar musicas, por <strong>artistas</strong>, na base de dados.
 	 */
 	private static void searchMusicByArtistsMenu() {
-		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR ARTISTA");
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): BUSCAR MUSICA POR ARTISTA");
 		String artists = MyIO.readLine("Artistas: ");
 		
 		db.searchByArtistName(artists.split(" "));
@@ -190,7 +200,7 @@ public class App {
 	 * <strong>artistas</strong>, na base de dados.
 	 */
 	private static void searchMusicByNameAndArtistsMenu() {
-		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME E ARTISTA");
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): BUSCAR MUSICA POR NOME E ARTISTA");
 		String name = MyIO.readLine("Nome: ");
 		String artists = MyIO.readLine("Artistas: ");
 		
@@ -205,7 +215,7 @@ public class App {
 	private static void updateMusicMenu(MusicDTO dto) {
 		Music music = dto.getMusic().clone();
 		String updates;
-		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): ATUALIZAR MUSICA: " + music.getID());
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): ATUALIZAR MUSICA: " + music.getID());
 		MyIO.println("Nao atualizar -> '.'");
 		
 		updates = MyIO.readLine("Nome: ");
@@ -230,11 +240,22 @@ public class App {
 	 */
 	private static void deleteMusicByIdMenu() {
 		int id;
-		MyIO.println("\n\nTP02 - AEDS III (Spotify Musics): APAGAR MUSICA");
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): APAGAR MUSICA");
 		id = MyIO.readInt("ID da musica: ");
 		boolean success = db.deleteRecord(id);
 		
 		MyIO.println((success ? "Sucesso ao apagar musica: " : "Falha ao apagar musica: ")+id+ "\n\n");
+	}
+	
+	/**
+	 * Menu para restauracao de backup
+	 */
+	private static void restoreBackupMenu() {
+		int version;
+		MyIO.println("\n\nTP03 - AEDS III (Spotify Musics): RESTAURAR BACKUP");
+		version = MyIO.readInt("Versao: ");
+		db.decompressBackup(version);
+		db = new DataBaseAccess();
 	}
 	
 	/**

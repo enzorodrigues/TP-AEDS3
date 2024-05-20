@@ -4,9 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import main.java.br.pucminas.aedsiii.App;
 
 /**
  * Entidade referente aos dados manipulados na aplicação.
@@ -50,7 +51,16 @@ public class Music {
 		this.inSpotifyPlaylists = inSpotifyPlaylists;
 		this.rankSpotifyCharts = rankSpotifyCharts;
 		this.spotifyStreams = spotifyStreams;
+		normalizeStrings();
 	}
+	
+	private void normalizeStrings() {
+		 this.name.replace(App.DIVIDER, "");
+		 for(byte i=0; i<artistsCount;i++) {
+			 artists[i].replace(App.DIVIDER, "");
+		 }
+	}
+
 	
 	/**
 	 * Intancia de um objeto musica com todos os dados definidos
@@ -220,5 +230,16 @@ public class Music {
 			System.err.println("Erro ao decodificar musica");
 		}
         return music;
+	}
+	
+	public String toCompactString() {
+		String compact = App.DIVIDER;
+		compact += id + App.DIVIDER + name.length() + App.DIVIDER + name + App.DIVIDER + artistsCount + App.DIVIDER;
+		for(String artist : artists) {
+			compact += artist.length() + App.DIVIDER;
+			compact += artist + App.DIVIDER;
+		}
+		compact += releaseDate.getTime() + App.DIVIDER + inSpotifyPlaylists + App.DIVIDER + rankSpotifyCharts + App.DIVIDER + spotifyStreams;
+		return compact;
 	}
 }
