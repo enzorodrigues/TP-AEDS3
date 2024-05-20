@@ -4,6 +4,7 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import main.java.br.pucminas.aedsiii.App;
 import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.DTO.LineDTO;
 
 /**
@@ -28,7 +29,7 @@ public class InvertedList {
 		try {
 			this.fileName = fileName;
 			this.lineReferenceSize = lineReferencesQuantity;
-			String path = System.getProperty("user.dir")+"\\src\\main\\resources\\indexes\\invertedLists\\";
+			String path = App.resourcePath+"indexes\\invertedLists\\";
 			db = new RandomAccessFile(path+fileName, "rw");
 		} catch(Exception e) {
 			System.err.println("Error on open invertedList: "+fileName);
