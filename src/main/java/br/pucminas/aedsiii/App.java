@@ -117,7 +117,7 @@ public class App {
 					restoreBackupMenu();
 					break;
 				case 0:
-					list();
+					//list();
 					break;
 				default:
 					MyIO.println("OPCAO INVALIDA");

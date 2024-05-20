@@ -3,3 +3,4 @@
 .settings
 bin
 output.txt
+src/main/resources/backups/*
