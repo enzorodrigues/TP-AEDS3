@@ -22,3 +22,8 @@ Este projeto é separado em partes/entregas, e cada uma é evolução da entrega
 ### Entrega 03
 - Implementação do algoritmo de compactção LZW; ✅
 - Opções de gerar/restaurar backups; ✅
+
+### Entrega 04
+- Implementação de algoritmos de Casamento de Padrão ✅
+- Força-Bruta, KMP, KMP-Melhorado, Boyer-Moore ✅
+- Comparativo entre algoritmos ✅

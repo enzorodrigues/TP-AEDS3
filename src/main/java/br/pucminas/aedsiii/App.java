@@ -20,7 +20,7 @@ public class App {
 	
 	private static String csvFilePath = resourcePath+"popularSpotifySongs.csv";
 	private static DataBaseAccess db;
-	private static int VERSION = 3;
+	private static int VERSION = 4;
 	
 	/**
 	 * Realiza a leitura da base de dados e insere as musicas
@@ -84,6 +84,7 @@ public class App {
 			MyIO.println("7 - Apagar musica por ID");
 			MyIO.println("8 - Gerar backup");
 			MyIO.println("9 - Restaurar backup");
+			MyIO.println("10 - Casamento de padrão");
 			MyIO.println("0 - SAIR");
 			MyIO.print("Selecao: ");
 			option = MyIO.readInt();
@@ -115,6 +116,9 @@ public class App {
 					break;
 				case 9:
 					restoreBackupMenu();
+					break;
+				case 10:
+					patternMatchingMenu();
 					break;
 				case 0:
 					//list();
@@ -253,11 +257,17 @@ public class App {
 	 * Menu para restauracao de backup
 	 */
 	private static void restoreBackupMenu() {
-		int version;
 		MyIO.println("\n\nTP"+VERSION+" - AEDS III (Spotify Musics): RESTAURAR BACKUP");
-		version = MyIO.readInt("Versao: ");
+		int version = MyIO.readInt("Versao: ");
 		db.decompressBackup(version);
 		db = new DataBaseAccess();
+	}
+	
+	private static void patternMatchingMenu() {
+		MyIO.println("\n\nTP"+VERSION+" - AEDS III (Spotify Musics): CASAMENTO DE PADRÃO");
+		String pattern = MyIO.readLine("Padrão a encontrar: ");
+		db.searchPattern(pattern);
+		MyIO.println("\n");
 	}
 	
 	/**

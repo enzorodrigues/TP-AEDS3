@@ -11,7 +11,7 @@ import java.util.List;
 import main.java.br.pucminas.aedsiii.App;
 
 /**
- * Classe compressao da base de dados utilizando o algoritmo LZW.
+ * Classe para compressao da base de dados utilizando o algoritmo LZW.
  * 
  * @since TP03
  * @version 1

@@ -15,6 +15,8 @@ import main.java.br.pucminas.aedsiii.Entity.Music;
 import main.java.br.pucminas.aedsiii.Indexes.Index;
 import main.java.br.pucminas.aedsiii.Indexes.BTree.BStarTree;
 import main.java.br.pucminas.aedsiii.Indexes.InvertedLists.InvertedList;
+import main.java.br.pucminas.aedsiii.PatternMatching.MatchingResult;
+import main.java.br.pucminas.aedsiii.PatternMatching.PatternMatching;
 
 /**
  * Classe responsavel pelo gerenciamento do
@@ -334,10 +336,11 @@ public class DataBaseAccess {
 		String extract=  extractDatabaseToString();
 		
 		try {
-			Instant start = Instant.now();
 			int version;
+			Instant start = Instant.now();
 			version = LZW.compress(extract, db.length());
 			Instant end = Instant.now();
+			
 			Duration timeElapsed = Duration.between(start, end);
 			MyIO.println("Sucesso ao criar backup! Versionamento: "+ version);
 			MyIO.println("Duracao: "+ timeElapsed.toMillis() +" ms\n");
@@ -422,5 +425,24 @@ public class DataBaseAccess {
 		db.seek(0);
 		db.writeInt(id);
 		return id;
+	}
+	
+	public void searchPattern(String pattern) {
+		String databaseExtract = extractDatabaseToString().replace(App.DIVIDER, "");
+		MyIO.println(databaseExtract);
+		PatternMatching pm = new PatternMatching();
+		MatchingResult result;
+		
+		result = pm.bruteForce(databaseExtract, pattern);
+		MyIO.println(result.toString());
+		
+		result = pm.KMP(databaseExtract, pattern, false);
+		MyIO.println(result.toString());
+		
+		result = pm.KMP(databaseExtract, pattern, true);
+		MyIO.println(result.toString());
+		
+		result = pm.boyerMoore(databaseExtract, pattern);
+		MyIO.println(result.toString());
 	}
 }
