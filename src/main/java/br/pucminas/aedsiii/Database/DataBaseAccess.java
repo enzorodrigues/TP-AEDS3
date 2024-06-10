@@ -444,5 +444,8 @@ public class DataBaseAccess {
 		
 		result = pm.boyerMoore(databaseExtract, pattern);
 		MyIO.println(result.toString());
+		
+		result = pm.rabinKarp(databaseExtract, pattern);
+		MyIO.println(result.toString());
 	}
 }

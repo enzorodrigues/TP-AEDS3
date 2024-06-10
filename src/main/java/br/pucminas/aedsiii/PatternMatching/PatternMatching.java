@@ -14,6 +14,7 @@ import main.java.br.pucminas.aedsiii.MyIO;
  * @version 1
  */
 public class PatternMatching {
+	private static int rabinKarpCompares = 0;
 
 	public PatternMatching() { }
 	
@@ -64,9 +65,9 @@ public class PatternMatching {
 		int comparisons = 0, j=0;
 		int textSize = text.length();
 		int patternSize = pattern.length();
+		Instant start = Instant.now();
 		int[] PI = improvedPrefix ? improvedPrefixFunction(pattern) : prefixFunction(pattern);
 		
-		Instant start = Instant.now();
 		for(int i=0; (i < textSize) && (j < patternSize); i++, j++) {
 			while(j >= 0 && text.charAt(i) != pattern.charAt(j)) {
 				comparisons++;
@@ -142,10 +143,10 @@ public class PatternMatching {
 		int comparisons = 0, shift=0, j=0;
 		int textSize = text.length();
 		int patternSize = pattern.length();
+		Instant start = Instant.now();
 		HashMap<Character, Integer> offsetByBadCharacter = offsetByBadCharacter(pattern.substring(0, patternSize-1));
 		int[] offsetByGoodSuffix = offsetByGoodSuffix(pattern);
 		
-		Instant start = Instant.now();
 		while (shift <= (textSize - patternSize)) {
             j = patternSize - 1;
 
@@ -279,5 +280,47 @@ public class PatternMatching {
 		} while(!reducedSuffix.isEmpty());
 		
 		return -1;
+	}
+	
+	public MatchingResult rabinKarp(String text, String pattern) {
+		int textSize = text.length();
+		int patternSize = pattern.length();
+		boolean result = false;
+		rabinKarpCompares = 0;
+		
+		Instant start = Instant.now();
+		
+		int patternHash = hash(pattern);
+		for(int i=0; i < textSize-patternSize; i++) {
+			String sub = text.substring(i, i+patternSize);
+			if(hash(sub) == patternHash && compare(sub, pattern)) {
+				result = true;
+				break;
+			}
+		}
+		
+		Instant end = Instant.now();
+		Duration timeElapsed = Duration.between(start, end);
+		String methodComparisons = "Rabin-Karp - Comparações: "+rabinKarpCompares;
+		
+		return new MatchingResult(methodComparisons, timeElapsed, result);
+	}
+	
+	private int hash(String text) {
+		int mod = 937, result=0;
+		for(char i : text.toCharArray()) {
+			result+=i;
+		}
+		return result % mod;
+	}
+	
+	private boolean compare(String text, String pattern) {
+		for(int i=0; i<text.length(); i++) {
+			rabinKarpCompares++;
+			if(text.charAt(i) != pattern.charAt(i)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
