@@ -429,7 +429,7 @@ public class DataBaseAccess {
 	
 	public void searchPattern(String pattern) {
 		String databaseExtract = extractDatabaseToString().replace(App.DIVIDER, "");
-		MyIO.println(databaseExtract);
+		//MyIO.println(databaseExtract);
 		PatternMatching pm = new PatternMatching();
 		MatchingResult result;
 		

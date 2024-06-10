@@ -33,19 +33,18 @@ public class PatternMatching {
 		int textSize = text.length();
 		int patternSize = pattern.length();
 		
-		Instant start = Instant.now();
+		long start = System.currentTimeMillis();
 		for(int i=0; (i < textSize) && (j < patternSize); i++, j++, comparisons++) {
 			if(text.charAt(i) != pattern.charAt(j)) {
 				i = i- j;
 				j = -1;
 			}
 		}
-		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
+		long end = System.currentTimeMillis();
 		String methodComparisons = "Força-Bruta - Comparações: "+comparisons;
 		boolean result = j == patternSize;
 		
-		return new MatchingResult(methodComparisons, timeElapsed, result);
+		return new MatchingResult(methodComparisons, (end-start), result);
 	}
 	
 	
@@ -65,7 +64,7 @@ public class PatternMatching {
 		int comparisons = 0, j=0;
 		int textSize = text.length();
 		int patternSize = pattern.length();
-		Instant start = Instant.now();
+		long start = System.currentTimeMillis();
 		int[] PI = improvedPrefix ? improvedPrefixFunction(pattern) : prefixFunction(pattern);
 		
 		for(int i=0; (i < textSize) && (j < patternSize); i++, j++) {
@@ -78,12 +77,11 @@ public class PatternMatching {
             }
 		}
 		
-		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
+		long end = System.currentTimeMillis();
 		String methodComparisons = (improvedPrefix ? "KMP Melhorado" : "KMP")+" - Comparações: "+comparisons;
 		boolean result = j == patternSize;
 		
-		return new MatchingResult(methodComparisons, timeElapsed, result);
+		return new MatchingResult(methodComparisons, (end-start), result);
 	}
 	
 	/**
@@ -143,7 +141,7 @@ public class PatternMatching {
 		int comparisons = 0, shift=0, j=0;
 		int textSize = text.length();
 		int patternSize = pattern.length();
-		Instant start = Instant.now();
+		long start = System.currentTimeMillis();
 		HashMap<Character, Integer> offsetByBadCharacter = offsetByBadCharacter(pattern.substring(0, patternSize-1));
 		int[] offsetByGoodSuffix = offsetByGoodSuffix(pattern);
 		
@@ -167,12 +165,11 @@ public class PatternMatching {
             }
         }
 		
-		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
+		long end = System.currentTimeMillis();
 		String methodComparisons = "Boyer-Moore - Comparações: "+comparisons;
 		boolean result = j < 0;
 		
-		return new MatchingResult(methodComparisons, timeElapsed, result);
+		return new MatchingResult(methodComparisons, (end-start), result);
 	}
 	
 	/**
@@ -288,7 +285,7 @@ public class PatternMatching {
 		boolean result = false;
 		rabinKarpCompares = 0;
 		
-		Instant start = Instant.now();
+		long start = System.currentTimeMillis();
 		
 		int patternHash = hash(pattern);
 		for(int i=0; i < textSize-patternSize; i++) {
@@ -299,11 +296,10 @@ public class PatternMatching {
 			}
 		}
 		
-		Instant end = Instant.now();
-		Duration timeElapsed = Duration.between(start, end);
+		long end = System.currentTimeMillis();
 		String methodComparisons = "Rabin-Karp - Comparações: "+rabinKarpCompares;
 		
-		return new MatchingResult(methodComparisons, timeElapsed, result);
+		return new MatchingResult(methodComparisons, (end-start), result);
 	}
 	
 	private int hash(String text) {

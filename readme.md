@@ -25,5 +25,5 @@ Este projeto é separado em partes/entregas, e cada uma é evolução da entrega
 
 ### Entrega 04
 - Implementação de algoritmos de Casamento de Padrão ✅
-- Força-Bruta, KMP, KMP-Melhorado, Boyer-Moore ✅
+- Força-Bruta, KMP, KMP-Melhorado, Boyer-Moore e Rabin-Karp ✅
 - Comparativo entre algoritmos ✅

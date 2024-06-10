@@ -16,9 +16,9 @@ public class MatchingResult {
 	private long timeElapsedInMiliSeconds;
 	private boolean result;
 
-	public MatchingResult(String methodComparisons, Duration timeElapsed, boolean result) {
+	public MatchingResult(String methodComparisons, long timeElapsed, boolean result) {
 		this.methodComparisons = methodComparisons;
-		this.timeElapsedInMiliSeconds = timeElapsed.toMillis();
+		this.timeElapsedInMiliSeconds = timeElapsed;
 		this.result = result;
 	}
 	
