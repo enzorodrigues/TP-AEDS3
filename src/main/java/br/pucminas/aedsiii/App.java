@@ -20,7 +20,7 @@ public class App {
 	
 	private static String csvFilePath = resourcePath+"popularSpotifySongs.csv";
 	private static DataBaseAccess db;
-	private static int VERSION = 4;
+	private static String VERSION = "05";
 	
 	/**
 	 * Realiza a leitura da base de dados e insere as musicas

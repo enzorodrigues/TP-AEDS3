@@ -27,3 +27,9 @@ Este projeto é separado em partes/entregas, e cada uma é evolução da entrega
 - Implementação de algoritmos de Casamento de Padrão ✅
 - Força-Bruta, KMP, KMP-Melhorado, Boyer-Moore e Rabin-Karp ✅
 - Comparativo entre algoritmos ✅
+
+### Entrega 05
+- Correção da extração para Casamento de Padrão: Considera apenas registros não excluídos ✅
+- Implementação de algoritmos de Criptografia ✅
+- Cifra de César e Cifra de Coluna ✅
+- Aplicados na respectiva ordem no atributo `Music.name`. ✅
