@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import main.java.br.pucminas.aedsiii.App;
+import main.java.br.pucminas.aedsiii.Crypto.Crypto;
 
 /**
  * Entidade referente aos dados manipulados na aplicação.
@@ -186,7 +187,7 @@ public class Music {
         try {
         	dos.writeInt(this.id);
             dos.writeShort(this.name.length());
-            dos.writeUTF(this.name);
+            dos.writeUTF(Crypto.encrypt(this.name));
             dos.writeByte(this.artistsCount);
             for(String artist : this.artists) {
             	dos.writeShort(artist.length());
@@ -215,7 +216,7 @@ public class Music {
         try {
         	music.id = dis.readInt();
             dis.readShort();
-            music.name = dis.readUTF();
+            music.name = Crypto.decrypt(dis.readUTF());
             music.artistsCount = dis.readByte();
             music.artists = new String[music.artistsCount];
             for(int i=0; i < music.artistsCount; i++) {
