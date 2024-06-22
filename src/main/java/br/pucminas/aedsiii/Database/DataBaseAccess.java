@@ -370,19 +370,23 @@ public class DataBaseAccess {
 		String extract="";
 		try {
 			int size;
+			char gravestone;
 			byte[] recording;
 			Music music;
 			
 			db.seek(0);
 			extract += db.readInt();
 			while(db.getFilePointer() < db.length()) {
-				extract += App.DIVIDER + db.readChar() + App.DIVIDER;
+				gravestone = db.readChar();
 				size = db.readInt();
-				extract += size;
 				recording = new byte[size];
 				db.read(recording);
 				music = Music.fromByteArray(recording);
-				extract += music.toCompactString();
+				if(gravestone != GRAVESTONE_SIGNAL) {
+					extract += App.DIVIDER + gravestone + App.DIVIDER;
+					extract += size;
+					extract += music.toCompactString();
+				}
 			}	
 		} catch (Exception e) {
 			System.err.println("Error on extract database to string");
