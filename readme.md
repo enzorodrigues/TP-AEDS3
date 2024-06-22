@@ -4,7 +4,7 @@ Este projeto é referente ao desenvolvimento do trabalho prático aplicado na ma
 
 ## Objetivos
 
-Aplicar na prática os conceitos ensinados durante as aulas teoricas, desenvolvendo uma aplicação que encapsule toda a matéria aplicada durante o semestre referente a MANIPULAÇÃO DE ARQUIVOS BINÁRIOS.
+Aplicar na prática os conceitos ensinados durante as aulas teoricas, desenvolvendo uma aplicação que encapsule toda a matéria aplicada durante o semestre referente a MANIPULAÇÃO DE ARQUIVOS BINÁRIOS, ESTRUTURAS DE DADOS, COMPACTAÇÃO, CASAMENTO DE PADRÃO e CRIPTOGRAFIA.
 
 Este projeto é separado em partes/entregas, e cada uma é evolução da entrega anterior. Aplicando funcionalidades e técninas a medida que avançamos com o conteúdo da matéria.
 
