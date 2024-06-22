@@ -94,8 +94,7 @@ public class Crypto {
 			}
 		}
 		
-		System.out.println(result.replace(";", ""));
-		return result.replace(";", "");
+		return result.replace("\u001e", "");
 	}
 	
 	/**
@@ -114,7 +113,7 @@ public class Crypto {
 		for(int i=0; i<order.length; i++) {
 			int j=order[i]; 
 			for(int k=0; k<lines && c<encrencryptedText.length(); k++) {
-				if(table[k][j] == ';') continue;
+				if(table[k][j] == '\u001e') continue;
 				table[k][j] = encrencryptedText.charAt(c++);
 			}
 		}
@@ -126,7 +125,7 @@ public class Crypto {
 			}
 		}
 		
-		return result.replace(";", "");
+		return result.replace("\u001e", "");
 	}
 	
 	/**
@@ -142,7 +141,7 @@ public class Crypto {
 		char[][] table = new char[lines][columns];
 		
 		for(int mod = textLength % columns; mod>0 && mod < columns; mod++) {
-			table[lines-1][mod] = ';';
+			table[lines-1][mod] = '\u001e';
 		}
 		
 		return table;
